@@ -1,0 +1,165 @@
+name: Build dotnet CI
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      environment_service:
+        type: string
+        required: true
+      dotnet_tools:
+        type: boolean
+        default: true
+      runner_group:
+        type: string
+        required: true
+      checkmarx:
+        type: boolean
+        required: false
+        default: false
+      mend:
+        type: boolean
+        required: false
+        default: false
+      csprojpath:
+        type: string
+        required: true
+      csproj_name:
+        type: string
+        required: true
+      checkmarx_proj_name:
+        type: string
+        required: true
+      mend_proj_name:
+        type: string
+        required: true
+
+### env vars
+# 1. csprojpath
+# 2. csproj_name
+### repo vars:
+# 1. CHECKMARX_EYX_USER
+
+jobs:
+  build:
+    runs-on: 
+      group: ${{ inputs.runner_group }}
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Run Checkmarx CxFlow Scan - SAST
+      - name: Checkmarx CxFlow Action and continue on error
+        if: (github.event_name == 'workflow_dispatch' && inputs.checkmarx == 'true') || (github.event_name != 'workflow_dispatch' && vars.CHECKMARX == 'true')
+        uses: checkmarx-ts/checkmarx-cxflow-github-action@v1.9
+        with:
+          project: 'EYQ-EYX-${{ inputs.checkmarx_proj_name }}-${{ inputs.environment_service }}'
+          team: 'CxServer/SP/EY/Service Lines/CT'
+          checkmarx_url: 'https://vmey.checkmarx.net/'
+          checkmarx_username: ${{ vars.CHECKMARX_EYX_USER }}
+          checkmarx_password: ${{ secrets.CHECKMARX_EYX_PASS }}
+          checkmarx_client_secret: ${{ secrets.CHECKMARX_CLIENT_SECRET }}
+          scanners: sast
+          bug_tracker: Sarif
+          preset: EY-Recommended
+          break_build: ${{ vars.CHECKMARX_BREAK_BUILD }}
+          params: --repo-path ./${{ inputs.csprojpath }} --source-dir ./${{ inputs.csprojpath }} --cx-flow.thresholds.high ${{ vars.checkmarx_threshold_high }} --cx-flow.thresholds.medium ${{ vars.checkmarx_threshold_medium }}
+
+
+      # Step 3: Set up .NET Core SDK
+      - name: Setup .NET Core SDK 8.0.405
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.405'
+
+      # Step 4: Restore dependencies
+      - name: Restore Dependencies
+        run: dotnet restore $GITHUB_WORKSPACE/${{ inputs.csprojpath }}/*.csproj
+
+      # Step 5: Build the project
+      - name: Build Project
+        run: dotnet build $GITHUB_WORKSPACE/${{ inputs.csprojpath }}/*.csproj
+
+      # Step 6 : Publish the project
+      - name: Publish Project
+        run: dotnet publish $GITHUB_WORKSPACE/${{ inputs.csprojpath }}/*.csproj --configuration Release --output $GITHUB_WORKSPACE/publish_output
+
+      # Step 7: Restore local tools
+      - name: Restore Local Tools
+        if: ${{ inputs.dotnet_tools }}
+        run: |
+              dotnet tool restore --tool-manifest $GITHUB_WORKSPACE/${{ inputs.csprojpath }}/.config/dotnet-tools.json
+
+      # Step 8: Generate swagger
+      - name: Generate Swagger
+        if: ${{ inputs.dotnet_tools }}
+        working-directory: ${{ github.workspace }}/${{ inputs.csprojpath }}
+        run: |
+              dotnet tool run swagger tofile --output $GITHUB_WORKSPACE/swagger.json $GITHUB_WORKSPACE/${{ inputs.csprojpath }}/bin/Release/net8.0/${{ inputs.csproj_name }}.dll v1
+
+      # Step 9: Create build directory and copy necessary files
+      - name: Create build folder
+        run: |
+          mkdir -p build
+
+      # Step 10: Copy necessary files to build directory to be consumed by the deployment pipeline
+      - name: Copy Swagger to Build Directory
+        if: ${{ inputs.dotnet_tools }}
+        run: |
+          cp $GITHUB_WORKSPACE/swagger.json build/
+
+      # Step 11: Copy APIM-Update.ps1 and policies.xml files to Build Directory
+      - name: Copy APIM-Update.ps1 file to Build Directory
+        if: ${{ inputs.dotnet_tools }}
+        run: |
+          cp -r $GITHUB_WORKSPACE/.github/workflows/resources/APIM-Update.ps1 build/
+          cp -r $GITHUB_WORKSPACE/.github/workflows/resources/policies.xml build/
+
+      # Step 12: Copy publish output to build directory
+      - name: Copy publish files to Build Directory
+        run: |
+          shopt -s dotglob
+          cp -r $GITHUB_WORKSPACE/publish_output/* build/
+
+      # - name: Qualys WAS scan action step
+      #   uses: Qualys/github_action_qwas@main
+      #   id: was
+      #   with:
+      #     API_SERVER: ${{ vars.API_SERVER }}
+      #     QUALYS_USERNAME: 1110732
+      #     QUALYS_PASSWORD: 
+      #     WEBAPP_ID: 1132795901-GTP-FS/RAPToR
+      #     SCAN_NAME: 
+      #     SCAN_TYPE: VULNERABILITY
+      #     AUTH_RECORD: Other
+      #     WAIT_FOR_RESULT: 60*24
+      #     INTERVAL: 5
+
+      # Step 14: Run Mend scan. This requires the app to have been built first.
+      - name: "Mend (formerly whitesource) Scan and continue on error "
+        if: (github.event_name == 'workflow_dispatch' && inputs.mend == 'true') || (github.event_name != 'workflow_dispatch' && vars.MEND == 'true')
+        uses: ey-org/oss-scanner@master
+        with:
+          apm-id: APM0023852
+          spr-id: 'SPR-17504'
+          portfolio: 'CT'
+          projectName: 'EYQ-EYX-${{ inputs.mend_proj_name }}--${{ inputs.environment_service }}'
+          mend-key: ${{ secrets.MEND_ACTION_STS }}
+          validationKey: ${{  secrets.ARCHER_SPR_API_TOKEN }}
+          connectionKey: ${{ secrets.INFOSEC_CONNECTIONKEY }}
+
+      - name: List Published Files
+        run: ls -R $GITHUB_WORKSPACE
+
+      # Step 16: Upload build artifacts
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ inputs.environment }}
+          path: build/
+          include-hidden-files: true
