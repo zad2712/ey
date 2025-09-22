@@ -1,0 +1,95 @@
+name: Deploy Container App CD
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      dockerEnv:
+        type: string
+        required: true
+      runner_group:
+        type: string
+        required: true
+      proj_name:
+        type: string
+        required: true
+      dockerRepository:
+        type: string
+        required: true
+
+### env vars
+# 3. acrName
+# 4. acrSecondName
+# 5. targetAppName
+# 6. resourceGroup
+
+jobs:
+  deploy:
+    runs-on: 
+      group: ${{ inputs.runner_group }}
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Download source artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ inputs.environment }}
+          path: ${{ inputs.proj_name }}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Docker login to ACR
+        run: |
+          az acr login --name ${{ vars.acrName }}
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            --build-arg Environment=${{ inputs.dockerEnv }} \
+            -t ${{ vars.acrName }}${{ vars.acrSecondName }}.azurecr.io/${{ inputs.dockerRepository }}/${{ inputs.proj_name }}:${{ github.run_id }} \
+            -f ./${{ inputs.proj_name }}/Dockerfile ./${{ inputs.proj_name }}
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ vars.acrName }}${{ vars.acrSecondName }}.azurecr.io/${{ inputs.dockerRepository }}/${{ inputs.proj_name }}:${{ github.run_id }}
+
+      - id: approval
+        uses: ekeel/approval-action@v1.0.3
+        if: github.event.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          # A GitHub token with repo scope.
+          # The default secrets.GITHUB_TOKEN does not work with octokit to open/update/close issues.
+          token: ${{ secrets.PAT_TOKEN_GH }}
+          # A comma separated list of GitHub usernames that are allowed to approve.
+          # Example: 'ekeel,octocat'
+          approvers: 'XE064259743_EYGS,US016020768_EYGS,US015802021_EYGS,20230108971_EYGS'
+          # The number of approvals/rejections required to continue the workflow.
+          minimumApprovals: '1'
+          # The title of the issue to create.
+          issueTitle: 'Deploy container app: ${{ vars.targetAppName }} in RG: ${{ vars.resourceGroup }}'
+          # The body of the issue to create.
+          issueBody: 'Image: ${{ vars.acrName }}${{ vars.acrSecondName }}.azurecr.io/${{ inputs.dockerRepository }}/${{ inputs.proj_name }}:${{ github.run_id }}'
+          # A comma separated list of labels to add to the issue.
+          issueLabels: 'ManualApproval,ApprovalAction'
+          # Exclude the workflow initiator from the list of approvers.
+          excludeInitiator: 'false'
+          # A comma separated list of words that will be used to approve.
+          approveWords: 'approve, approved'
+          # A comma separated list of words that will be used to reject.
+          rejectWords: 'deny, denied, reject, rejected'
+          # The number of minutes to wait between checks for approvals.
+          waitInterval: '1'
+          # The number of minutes to wait before timing out.
+          waitTimeout: '60'
+
+      - name: Deploy to Azure Container App
+        run: |
+          az containerapp update \
+            --name ${{ vars.targetAppName }} \
+            --resource-group ${{ vars.resourceGroup }} \
+            --image ${{ vars.acrName }}${{ vars.acrSecondName }}.azurecr.io/${{ inputs.dockerRepository }}/${{ inputs.proj_name }}:${{ github.run_id }} \
+            --set-env-vars ENV=${{ inputs.dockerEnv }}
