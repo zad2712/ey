@@ -1,0 +1,10 @@
+az login --use-device-code
+
+az login --tenant 5b973f99-77df-4beb-b27d-aa0c70b8482c --use-device-code
+ 
+az account set --subscription 7fae53b3-a43e-41bd-b4db-5d397c2a3cd0 <n° subscription>
+ 
+az aks get-credentials --resource-group EUNDFAS0X7RSG01 --name eundfas0x7aks01 --overwrite-existing --admin
+ 
+
+kubectl edit kaasaddons kaasaddon -n kaas-system
