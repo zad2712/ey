@@ -1,0 +1,69 @@
+# Kubernetes 
+
+## Pre-requisites
+
+1. You need to have the `Az-CLI` and the `Az-PowerShell` tools installed in order to run this script.
+
+    You can follow this link to [Install Azure Powershell](https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&tabs=windowspowershell&pivots=windows-psgallery#installation).
+
+    This command may work but double check with the previous official link: `Install-Module -Name Az -Repository PSGallery -Force`
+
+2. Configure `openssl`, if you installed `git`, `openssl` will be included in the following path `C:\Users\<Your user>\AppData\Local\Programs\Git\mingw64\bin`. You can add this as an env variable to your Windows Machine.
+
+## Steps
+
+1. To request a new SSL certificate, please go to: [EY SSL Management](https://certificatemanagement.fabricmgmt.com/).
+
+    1.1. If any errors, you can reach out to `juan.martinez.alzate@ey.com`, Juan Martinez Alzate.
+
+2. The Key Vault where the certificate will be installed needs to have the IP and App ID with permissions to install the certificate
+
+3. Once the certificate has been generated, a **password** needs to be created with a new certificate that you will generate as well. Follow these steps:
+
+    a. Download the `.pfx` file from the Key Vault to your local computer, better to do it in the `C:\Certificates\` folder.
+
+    b. Install the certificate, an installation wizard will open.
+
+    c. In the `Certificate Store` option select `Local Computer` and ***not*** `Local User`. Approve with Admin Rights
+
+    d. Check the `Mark this key as exportable` option and Click on `Next`, leave the password space blank, since this certificate that you downloaded does not have a password
+
+    e. Select the `Personal Certificate Store` to install the certificate and click on `Next`
+
+    f. Click on `Finish`
+
+4. Once the certificate has been installed open the Windows Certificate Management for the ***Local Computer*** in the `Personal` Certificate Store, find your certificate and do the following:
+
+    a. `Right Click` > `All Tasks` > `Export...`
+
+    b. Click on `Next` and select the option to export the private key
+
+    c. Select the `PKCS #12 (.PFX)` option and select the following:
+
+    - `Include all certificates...`
+    - `Export all extended properties`
+    - `Enable Certificate Privacy`
+
+    d. Check the `password` option and ***set your own password*** for the new certificate that you are generating, and leave the default SHA encryption, click on `Next`
+
+    e. Specify a name and path (`C:\Certificates\`) to the new **certificate with password** you are generating.
+
+5. Once the certificate with password has been generated and it's located on the `C:\Certificates\` (`pfx` file). you can run the following commands in powershell, we named the certificate with password as `chatapi-eyqdev-eyfabric-ey-com-with-password.pfx` in this example:
+
+    a. `openssl pkcs12 -in chatapi-eyqdev-eyfabric-ey-com-with-password.pfx -nocerts -out eyqpersistencedev.key`. Enter the password for the certificate created in the previous export step and a passphrase of your choose.
+
+    b. `openssl rsa -in eyqpersistencedev.key -out eyqpersistencedev-decrypted.key`
+
+    c. `openssl pkcs12 -in chatapi-eyqdev-eyfabric-ey-com-with-password.pfx -nokeys -out eyqpersistencedev.crt`
+
+6. In the Azure Cloud Shell session (where you should be working with the `kubectl` commands), you need to upload the certificates using `Manage Files` and `Upload Files`.
+
+7. Run the following `kubectl`command to create a `secret` from the Cloud Shell session (which should be configured already to run commands on the specified cluster) that you are working in:
+
+    > **Note!**
+    >
+    > The TLS secret name used in the following command needs to be the same as the one specified in the `secret` name in the `tls` section of the `ingress` deployment in the K8S Manifest
+
+    ```bash
+    kubectl create secret tls persistence-tls --key eyqpersistencedev-decrypted.key --cert eyqpersistencedev.crt  -n eyq-chat-persistence-dev
+    ```
