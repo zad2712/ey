@@ -1,0 +1,385 @@
+name: Build and Deploy API
+
+on:
+  create:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        options:
+        - dev
+        - dev1
+        - dev2
+        - dev3
+        - qa
+        - uat-lab
+        - uat-pilot
+        - uat-prod
+        - prod-lab
+        - prod-pilot
+        - prod
+      checkmarx:
+        type: boolean
+        required: false
+        default: false
+      mend:
+        type: boolean
+        required: false
+        default: false
+      
+  push:
+    paths:
+      - services/EY.TaxGenAI/webapi/**
+      - services/EY.TaxGenAI/lib/**
+    branches:
+      - main
+      - release/*
+      - develop
+      - feature/*
+      - release_QA/*
+      - dev_1
+      - dev_2
+      - dev_3
+      - dev_1/**
+      - dev_2/**
+      - dev_3/**
+      - integrate-*
+      - release_UAT/*
+
+permissions:
+      id-token: write
+      contents: read
+# env:
+#   # build
+#   csproj_name: 'EY.TaxGenAI.API'
+#   csprojpath: 'services/EY.TaxGenAI/webapi'
+#   checkmarx_proj_name: API
+#   mend_proj_name: API
+#   # deploy
+#   apiid: geneyapi
+#   apipath: '/geney-api'
+#   apimproductname: CopilotChatWebApi
+#   csprojpath: 'services/EY.TaxGenAI/webapi'
+## vars
+# webapp_name -> manual config job
+
+jobs:
+  build-webapi-eyx-dev:
+    name: build-webapi-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate-')
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev
+      environment_service: Development
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-dev:
+    name: deploy-webapi-eyx-dev
+    needs: build-webapi-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate-')
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: dev
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx
+      webapp_name: USEDCXS05HWAP02
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-dev1:
+    name: build-webapi-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev1
+      environment_service: Development1
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-dev1:
+    name: deploy-webapi-eyx-dev1
+    needs: build-webapi-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: dev1
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx
+      webapp_name: USEDCXS05HWAP06
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-dev2:
+    name: build-webapi-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev2
+      environment_service: Development2
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-dev2:
+    name: deploy-webapi-eyx-dev2
+    needs: build-webapi-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: dev2
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx
+      webapp_name: USEDCXS05HWAP0A
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-dev3:
+    name: build-webapi-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev3
+      environment_service: Development3
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-dev3:
+    name: deploy-webapi-eyx-dev3
+    needs: build-webapi-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: dev3
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx
+      webapp_name: USEDCXS05HWAP0E
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-qa:
+    name: build-webapi-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: qa
+      environment_service: qa
+      runner_group: large-runner-vnet-eyx-qa
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-qa:
+    name: deploy-webapi-eyx-qa
+    needs: build-webapi-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: qa
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx-qa
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      webapp_name: useqcxs05hwap02
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+    secrets: inherit
+
+  build-webapi-eyx-uat-lab:
+    name: build-webapi-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-lab
+      environment_service: uat-lab
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-uat-lab:
+    name: deploy-webapi-eyx-uat-lab
+    needs: build-webapi-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: uat-lab
+      run_apim_script_update: true
+      runner_group: large-runner-grp-eyx-uat
+      webapp_name: USEUEYXU01WAP02
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-uat-pilot:
+    name: build-webapi-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-pilot
+      environment_service: uat-pilot
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-uat-pilot:
+    name: deploy-webapi-eyx-uat-pilot
+    needs: build-webapi-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: uat-pilot
+      run_apim_script_update: true
+      runner_group: large-runner-grp-eyx-uat
+      webapp_name: USEUEYXU01WAP06
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-uat-prod:
+    name: build-webapi-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-prod
+      environment_service: uat-prod
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-uat-prod:
+    name: deploy-webapi-eyx-uat-prod
+    needs: build-webapi-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: uat-prod
+      run_apim_script_update: true
+      runner_group: large-runner-grp-eyx-uat
+      webapp_name: USEUEYXU01WAP0A
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-prod-lab:
+    name: build-webapi-eyx-prod-lab
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod-lab
+      environment_service: prod-lab
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-prod-lab:
+    name: deploy-webapi-eyx-prod-lab
+    needs: build-webapi-eyx-prod-lab
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: prod-lab
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx-prod
+      webapp_name: 'USEPEYXP01WAP06'
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-prod-pilot:
+    name: build-webapi-eyx-prod-pilot
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod-pilot
+      environment_service: prod-pilot
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-prod-pilot:
+    name: deploy-webapi-eyx-prod-pilot
+    needs: build-webapi-eyx-prod-pilot
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: prod-pilot
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx-prod
+      webapp_name: 'USEPEYXP01WAP0A'
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
+
+  build-webapi-eyx-prod:
+    name: build-webapi-eyx-prod
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod
+      environment_service: prod
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.API'
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+      checkmarx_proj_name: API
+      mend_proj_name: API
+    secrets: inherit
+  deploy-webapi-eyx-prod:
+    name: deploy-webapi-eyx-prod
+    needs: build-webapi-eyx-prod
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-webapp.yml
+    with:
+      environment: prod
+      run_apim_script_update: true
+      runner_group: large-runner-vnet-eyx-prod
+      webapp_name: 'USEPEYXP01WAP0E'
+      apiid: geneyapi
+      apipath: '/geney-api'
+      apimproductname: CopilotChatWebApi
+      csprojpath: 'services/EY.TaxGenAI/webapi'
+    secrets: inherit
