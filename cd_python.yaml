@@ -1,0 +1,85 @@
+name: Build python CI
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      environment_service:
+        type: string
+        required: true
+      runner_group:
+        type: string
+        required: true
+      proj_name:
+        type: string
+        required: true
+      projectpath:
+        type: string
+        required: true
+      checkmarx_proj_name:
+        type: string
+        required: true
+      mend_proj_name:
+        type: string
+        required: true
+
+### repo vars:
+# 1. CHECKMARX_EYX_USER
+
+jobs:
+  build:
+    runs-on: 
+      group: ${{ inputs.runner_group }}
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Process project name
+        id: processname
+        run: |
+          originalName="${{ inputs.proj_name }}"
+          processedName="${originalName//./-}"
+          echo "processed_proj_name=$processedName" >> $GITHUB_OUTPUT
+
+      - name: Checkmarx CxFlow Action and continue on error
+        uses: checkmarx-ts/checkmarx-cxflow-github-action@v1.9
+        if: (github.event_name == 'workflow_dispatch' && inputs.checkmarx == 'true') || (github.event_name != 'workflow_dispatch' && vars.CHECKMARX == 'true')
+        with:
+          project: 'EYQ-EYX-${{ inputs.checkmarx_proj_name }}-${{ inputs.environment_service }}'
+          team: 'CxServer/SP/EY/Service Lines/CT'
+          checkmarx_url: 'https://vmey.checkmarx.net/'
+          checkmarx_username: ${{ vars.CHECKMARX_EYX_USER }}
+          checkmarx_password: ${{ secrets.CHECKMARX_EYX_PASS }}
+          checkmarx_client_secret: ${{ secrets.CHECKMARX_CLIENT_SECRET }}
+          scanners: sast
+          bug_tracker: Sarif
+          preset: EY-Recommended
+          break_build: ${{ vars.CHECKMARX_BREAK_BUILD }}
+          params: --repo-path ./${{ inputs.projectPath }} --source-dir ./${{ inputs.projectPath }}
+
+      - name: "Mend (formerly whitesource) Scan and continue on error "
+        if: (github.event_name == 'workflow_dispatch' && inputs.mend == 'true') || (github.event_name != 'workflow_dispatch' && vars.MEND == 'true')
+        uses: ey-org/oss-scanner@master
+        with:
+          apm-id: APM0023852
+          spr-id: 'SPR-17504'
+          portfolio: 'CT'
+          projectName: 'EYQ-EYX-${{ inputs.mend_proj_name }}-${{ inputs.environment_service }}'
+          mend-key: ${{ secrets.MEND_ACTION_STS }}
+          validationKey: ${{  secrets.ARCHER_SPR_API_TOKEN }}
+          connectionKey: ${{ secrets.INFOSEC_CONNECTIONKEY }}
+
+      - name: List Published Files
+        run: ls -R $GITHUB_WORKSPACE
+
+      # Step 9: Upload build artifacts
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ inputs.environment }}
+          path: ${{ inputs.projectPath }}/
