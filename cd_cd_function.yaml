@@ -1,0 +1,350 @@
+name: Build and Deploy TaxGenAI Functions
+
+on:
+  create:
+  push:
+    paths:
+      - services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions/**
+      - services/EY.TaxGenAI/lib/**
+    branches:
+      - main
+      - release/*
+      - develop
+      - feature/*
+      - release_QA/*
+      - dev_1
+      - dev_2
+      - dev_3
+      - dev_1/**
+      - dev_2/**
+      - dev_3/**
+      - integrate-*
+      - release_UAT/*
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        options:
+        - dev
+        - dev1
+        - dev2
+        - dev3
+        - qa
+        - uat-lab
+        - uat-pilot
+        - uat-prod
+        - prod-lab
+        - prod-pilot
+        - prod
+      checkmarx:
+        type: boolean
+        required: false
+        default: false
+      mend:
+        type: boolean
+        required: false
+        default: false
+permissions:
+      id-token: write
+      contents: read
+# env:
+#   # build
+#   csproj_name: 'EY.TaxGenAI.Functions'
+#   csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+#   checkmarx_proj_name: Functions
+#   mend_proj_name: Functions
+#   # deploy
+#   csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+## vars
+# function_name: -> manual config job
+
+jobs:
+  build-taxgenai-functions-eyx-dev:
+    name: build-taxgenai-functions-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate-')
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev
+      environment_service: Development
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-dev:
+    name: deploy-taxgenai-functions-eyx-dev
+    needs: build-taxgenai-functions-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate-')
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: dev
+      runner_group: large-runner-vnet-eyx
+      function_name: usndcxs05hazf01
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-dev1:
+    name: build-taxgenai-functions-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev1
+      environment_service: Development1
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-dev1:
+    name: deploy-taxgenai-functions-eyx-dev1
+    needs: build-taxgenai-functions-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: dev1
+      runner_group: large-runner-vnet-eyx
+      function_name: USEDCXS05HAZF02
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-dev2:
+    name: build-taxgenai-functions-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev2
+      environment_service: Development2
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-dev2:
+    name: deploy-taxgenai-functions-eyx-dev2
+    needs: build-taxgenai-functions-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: dev2
+      runner_group: large-runner-vnet-eyx
+      function_name: USEDCXS05HAZF03
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-dev3:
+    name: build-taxgenai-functions-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: dev3
+      environment_service: Development3
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-dev3:
+    name: deploy-taxgenai-functions-eyx-dev3
+    needs: build-taxgenai-functions-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: dev3
+      runner_group: large-runner-vnet-eyx
+      function_name: USEDCXS05HAZF04
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-qa:
+    name: build-taxgenai-functions-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: qa
+      environment_service: qa
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx-qa
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-qa:
+    name: deploy-taxgenai-functions-eyx-qa
+    needs: build-taxgenai-functions-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: qa
+      runner_group: large-runner-vnet-eyx-qa
+      function_name: USEQCXS05HAZF01
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-uat-lab:
+    name: build-taxgenai-functions-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-lab
+      environment_service: uat-lab
+      dotnet_tools: false
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-uat-lab:
+    name: deploy-taxgenai-functions-eyx-uat-lab
+    needs: build-taxgenai-functions-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: uat-lab
+      runner_group: large-runner-grp-eyx-uat
+      function_name: USEUEYXU01AZF01
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-uat-pilot:
+    name: build-taxgenai-functions-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-pilot
+      environment_service: uat-pilot
+      dotnet_tools: false
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-uat-pilot:
+    name: deploy-taxgenai-functions-eyx-uat-pilot
+    needs: build-taxgenai-functions-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: uat-pilot
+      runner_group: large-runner-grp-eyx-uat
+      function_name: USEUEYXU01AZF02
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-uat-prod:
+    name: build-taxgenai-functions-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: uat-prod
+      environment_service: uat-prod
+      dotnet_tools: false
+      runner_group: large-runner-grp-eyx-uat
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-uat-prod:
+    name: deploy-taxgenai-functions-eyx-uat-prod
+    needs: build-taxgenai-functions-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: uat-prod
+      runner_group: large-runner-grp-eyx-uat
+      function_name: USEUEYXU01AZF03
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-prod-lab:
+    name: build-taxgenai-functions-eyx-prod-lab
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod-lab
+      environment_service: prod-lab
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-prod-lab:
+    name: deploy-taxgenai-functions-eyx-prod-lab
+    needs: build-taxgenai-functions-eyx-prod-lab
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: prod-lab
+      runner_group: large-runner-vnet-eyx-prod
+      function_name: 'USEPEYXP01AZF02'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+
+  build-taxgenai-functions-eyx-prod-pilot:
+    name: build-taxgenai-functions-eyx-prod-pilot
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod-pilot
+      environment_service: prod-pilot
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-prod-pilot:
+    name: deploy-taxgenai-functions-eyx-prod-pilot
+    needs: build-taxgenai-functions-eyx-prod-pilot
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: prod-pilot
+      runner_group: large-runner-vnet-eyx-prod
+      function_name: 'USEPEYXP01AZF03'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
+  build-taxgenai-functions-eyx-prod:
+    name: build-taxgenai-functions-eyx-prod
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/ci-dotnet.yaml
+    with:
+      environment: prod
+      environment_service: prod
+      dotnet_tools: false
+      runner_group: large-runner-vnet-eyx-prod
+      csproj_name: 'EY.TaxGenAI.Functions'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+      checkmarx_proj_name: Functions
+      mend_proj_name: Functions
+    secrets: inherit
+  deploy-taxgenai-functions-eyx-prod:
+    name: deploy-taxgenai-functions-eyx-prod
+    needs: build-taxgenai-functions-eyx-prod
+    if: github.event.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd-functions.yml
+    with:
+      environment: prod
+      runner_group: large-runner-vnet-eyx-prod
+      function_name: 'USEPEYXP01AZF04'
+      csprojpath: 'services/EY.TaxGenAI/functions/EY.TaxGenAI.Functions'
+    secrets: inherit
+
