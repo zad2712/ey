@@ -1,0 +1,278 @@
+name: Build and Deploy WebUI
+# This workflow builds and deploys the WebUI for the EYX project across different environments (dev, qa, prod).
+# This follows a gitflow approach
+on:
+  create:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        options:
+        - dev
+        - dev1
+        - dev2
+        - dev3
+        - qa
+        - uat-lab
+        - uat-pilot
+        - uat-prod
+        - prod-lab
+        - prod-pilot
+        - prod
+      checkmarx:
+        type: boolean
+        required: false
+        default: false
+      mend:
+        type: boolean
+        required: false
+        default: false
+
+
+  push:
+    branches:
+      - main
+      - release/*
+      - develop
+      - release_QA/*
+      - integrate/*
+      - dev_1/*
+      - dev_2/*
+      - dev_3/*
+      - dev_1
+      - dev_2
+      - dev_3
+      - release_UAT/*
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  build-webui-eyx-dev:
+    name: build-webui-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate')
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: dev
+      runner_group: large-runner-vnet-eyx
+      checkmarx: ${{ inputs.checkmarx || false }}
+      mend: ${{ inputs.mend || false }}
+    secrets: inherit
+  deploy-webui-eyx-dev:
+    name: deploy-webui-eyx-dev
+    needs: build-webui-eyx-dev
+    if: github.event.ref == 'refs/heads/develop' || startsWith(github.event.ref, 'refs/heads/integrate')
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: dev
+      runner_group: large-runner-vnet-eyx
+    secrets: inherit
+
+  build-webui-eyx-dev1:
+    name: build-webui-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: dev1
+      runner_group: large-runner-vnet-eyx
+      checkmarx: ${{ inputs.checkmarx || false }}
+      mend: ${{ inputs.mend || false }}
+    secrets: inherit
+  deploy-webui-eyx-dev1:
+    name: deploy-webui-eyx-dev1
+    needs: build-webui-eyx-dev1
+    if: startsWith(github.event.ref, 'refs/heads/dev_1') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1' && (startsWith(github.event.ref, 'refs/heads/dev_1') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: dev1
+      runner_group: large-runner-vnet-eyx
+    secrets: inherit
+
+  build-webui-eyx-dev2:
+    name: build-webui-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: dev2
+      runner_group: large-runner-vnet-eyx
+      checkmarx: ${{ inputs.checkmarx || false }}
+      mend: ${{ inputs.mend || false }}
+    secrets: inherit
+  deploy-webui-eyx-dev2:
+    name: deploy-webui-eyx-dev2
+    needs: build-webui-eyx-dev2
+    if: startsWith(github.event.ref, 'refs/heads/dev_2') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2' && (startsWith(github.event.ref, 'refs/heads/dev_2') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: dev2
+      runner_group: large-runner-vnet-eyx
+    secrets: inherit
+
+  build-webui-eyx-dev3:
+    name: build-webui-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: dev3
+      runner_group: large-runner-vnet-eyx
+      checkmarx: ${{ inputs.checkmarx || false }}
+      mend: ${{ inputs.mend || false }}
+    secrets: inherit
+  deploy-webui-eyx-dev3:
+    name: deploy-webui-eyx-dev3
+    needs: build-webui-eyx-dev3
+    if: startsWith(github.event.ref, 'refs/heads/dev_3') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3' && (startsWith(github.event.ref, 'refs/heads/dev_3') || startsWith(github.event.ref, 'refs/heads/feature/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: dev3
+      runner_group: large-runner-vnet-eyx
+    secrets: inherit
+
+  build-webui-eyx-qa:
+    name: build-webui-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: qa
+      runner_group: large-runner-vnet-eyx-qa
+    secrets: inherit
+  deploy-webui-eyx-qa:
+    name: deploy-webui-eyx-qa
+    needs: build-webui-eyx-qa
+    if: (startsWith(github.event.ref,'refs/heads/release_QA/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_QA/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa' && startsWith(github.event.ref,'refs/heads/release_QA/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: qa
+      runner_group: large-runner-vnet-eyx-qa
+    secrets: inherit
+  
+
+  build-webui-eyx-uat-lab:
+    name: build-webui-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: uat-lab
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+  deploy-webui-eyx-uat-lab:
+    name: deploy-webui-eyx-uat-lab
+    needs: build-webui-eyx-uat-lab
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: uat-lab
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+
+  build-webui-eyx-uat-pilot:
+    name: build-webui-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: uat-pilot
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+  deploy-webui-eyx-uat-pilot:
+    name: deploy-webui-eyx-uat-pilot
+    needs: build-webui-eyx-uat-pilot
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: uat-pilot
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+
+
+  build-webui-eyx-uat-prod:
+    name: build-webui-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: uat-prod
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+  deploy-webui-eyx-uat-prod:
+    name: deploy-webui-eyx-uat-prod
+    needs: build-webui-eyx-uat-prod
+    if: (startsWith(github.event.ref,'refs/heads/release_UAT/') || github.event_name == 'create' && github.event.ref_type == 'branch' && (startsWith(github.ref, 'refs/heads/release_UAT/')) || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod' && startsWith(github.event.ref,'refs/heads/release_UAT/')))
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: uat-prod
+      runner_group: large-runner-grp-eyx-uat
+    secrets: inherit
+
+  approval-prod:
+    name: approval-prod
+    if: github.event.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && (inputs.environment == 'prod-lab' || inputs.environment == 'prod-pilot' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/approval-workflow.yml
+    with:
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+
+  build-webui-eyx-prod-lab:
+    name: build-webui-eyx-prod-lab
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod-lab')
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: prod-lab
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+  deploy-webui-eyx-prod-lab:
+    name: deploy-webui-eyx-prod-lab
+    needs: [approval-prod, build-webui-eyx-prod-lab]
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: prod-lab
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+
+  build-webui-eyx-prod-pilot:
+    name: build-webui-eyx-prod-pilot
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod-pilot')
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: prod-pilot
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+  deploy-webui-eyx-prod-pilot:
+    name: deploy-webui-eyx-prod-pilot
+    needs: [approval-prod, build-webui-eyx-prod-pilot]
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: prod-pilot
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+
+  build-webui-eyx-prod:
+    name: build-webui-eyx-prod
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod')
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment: prod
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+  deploy-webui-eyx-prod:
+    name: deploy-webui-eyx-prod
+    needs: [approval-prod, build-webui-eyx-prod]
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/cd.yml
+    with:
+      environment: prod
+      runner_group: large-runner-vnet-eyx-prod
+    secrets: inherit
+
+
+
+
+
