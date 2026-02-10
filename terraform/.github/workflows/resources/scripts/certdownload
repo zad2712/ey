@@ -1,0 +1,58 @@
+# Add the modules to the current session
+Import-Module Az.Accounts, Az.KeyVault
+
+# Replace the following variables
+$SubscrptionName = "SubscriptionName"
+$AzureKeyVaultName = "AzureKayVaultName"
+$CertificateName = "certificatename.ey.com"
+$CertificateNameInAKV = "certificatename-ey-com"
+$CertificatePassword = "EXAMPLEPASSWORD" ### Type a password of your choice.
+$CertificatePath = "C:\Users\Example\OneDrive - EY\Documents\Certs\" ### Type the directory where you want to export the PFX file. Do not remove the backslash at the end!
+$Username = "AXXXXXXX-MSP01@EY.NET"
+
+# End of configuration section
+
+Write-Warning "Ensure the Azure login account has access to 'Secrets' and 'Certificates' in Key Vault: $AzureKeyVaultName"
+$key = Read-Host "Do you want to continue? (Y/N): "
+
+if ($key -eq "n" -or $key -eq "no") {
+    break
+}
+
+$CredsString = (Get-Credential -Message "Insert Azure login account" -UserName $Username)
+Connect-AzAccount -TenantId "5b973f99-77df-4beb-b27d-aa0c70b8482c" -Subscription $SubscrptionName -Credential $CredsString -WarningAction SilentlyContinue | Out-Null
+
+$error.clear()
+
+try {
+    $secureCertificatePassword = ConvertTo-SecureString $CertificatePassword -AsPlainText -Force
+
+    $certsecret = Get-AzKeyVaultSecret -VaultName $AzureKeyVaultName -Name $CertificateNameInAKV
+    $certsecret
+
+    $secretValueText = '';
+    $ssPtr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($certsecret.SecretValue)
+
+    try {
+        $secretValueText = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ssPtr)
+    } finally {
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ssPtr)
+    }
+
+    # Download the certificate from the AKV
+    $pfxFilePath = $CertificatePath + $CertificateName +".pfx"
+    $secretByte = [Convert]::FromBase64String($secretValueText)
+    [System.IO.File]::WriteAllBytes($pfxFilePath, $secretByte)
+
+    # Export the certificate with the password
+    $pfxCert = Get-PfxData -FilePath $pfxFilePath
+    Export-PfxCertificate -PFXData $pfxCert -FilePath $pfxFilePath -Password $secureCertificatePassword
+
+} catch {
+    Write-Host "Error is +  +$($Error[0].Exception.Message)"
+}
+
+if (!$error) {
+    Write-Host "Cert '$CertificateName' with pfx password '$CertificatePassword' exported to location: '$CertificatePath'"
+    $CertificatePassword | Out-File $CertificatePath$CertificateName"_pwd.txt"
+}

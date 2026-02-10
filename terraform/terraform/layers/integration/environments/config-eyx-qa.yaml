@@ -1,0 +1,30 @@
+##############
+#   eyx-qa   #
+##############
+# This file should be used as a reference for the Integration Layer configuration for the EYX QA environment.
+# It contains the configuration details for Azure Resources included in the Integration Layer.
+# It's pseudo-code only and should not be used as a real configuration file. 
+# The actual configuration should be done in the Terraform files located in the `il-eyx-iac/terraform/layers/integration/environments` directory.
+global:
+  tags:
+    ENVIRONMENT: "QA"
+    DEPLOYMENT_ID: "CXS05H"
+    ENGAGEMENT_ID: "I-68933458"
+    CTP_SERVICE: "Co-Dev"
+    OWNER: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+    PRODUCT_APP: "EYX - Agent Framework"
+    TF_LAYER: "Integration"
+  location: "eastus"
+  diagnostics:
+    enabled: true
+    logs:
+      AllMetrics: true
+      log_analytics: true
+      workspace_id: "qa log workspace id"
+###############################################################################################################
+###############################################################################################################
+apim:
+frontdoor:
+  secrets:
+    - name: "apim-certificate-secret"
+      value: "frontend-certificate-secret"

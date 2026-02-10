@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{9C6578E7-E4FE-79BB-1635-F363CC1E80DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E7A3C856-6834-D657-F2F0-05592DF2DDE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{615E38FD-63AE-826A-E1E6-C9A203A5B4AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedDataCosmosDb", ".github\workflows\resources\seedData-cosmosDb\SeedDataCosmosDb.csproj", "{9BFAF693-4273-BBAC-72AB-46C1BE314ADE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BFAF693-4273-BBAC-72AB-46C1BE314ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFAF693-4273-BBAC-72AB-46C1BE314ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFAF693-4273-BBAC-72AB-46C1BE314ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFAF693-4273-BBAC-72AB-46C1BE314ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E7A3C856-6834-D657-F2F0-05592DF2DDE9} = {9C6578E7-E4FE-79BB-1635-F363CC1E80DD}
+		{615E38FD-63AE-826A-E1E6-C9A203A5B4AB} = {E7A3C856-6834-D657-F2F0-05592DF2DDE9}
+		{9BFAF693-4273-BBAC-72AB-46C1BE314ADE} = {615E38FD-63AE-826A-E1E6-C9A203A5B4AB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C291A6F-F9EF-49CF-876E-679ACD4EC836}
+	EndGlobalSection
+EndGlobal

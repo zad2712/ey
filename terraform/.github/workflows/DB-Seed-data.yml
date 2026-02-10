@@ -1,0 +1,75 @@
+name: DB-Seed-Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        type: choice
+        required: true
+        options:
+          - dev
+          - dev1
+          - dev2
+          - dev3
+          - qa
+          - uat-lab
+          - uat-pilot
+          - uat-prod
+          - prod-lab
+          - prod-pilot
+          - prod
+      documentation:
+        description: 'Documentation'
+        default: 'https://eyus.atlassian.net/wiki/x/BoCTRg'
+
+permissions:
+      id-token: write
+      contents: read
+# SECRET_VALUE: kv -> ChatStore--Cosmos--ConnectionString
+
+jobs:
+  build:
+    runs-on: 
+      group: ${{ 
+          inputs.environment == 'qa' && 'large-runner-vnet-eyx-qa' ||  
+          startsWith(inputs.environment, 'uat') && 'large-runner-grp-eyx-uat' || 
+          startsWith(inputs.environment, 'prod') && 'large-runner-vnet-eyx-prod' ||
+          'large-runner-vnet-eyx' 
+        }} 
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Instructions
+      # - name: Checkout the instructions
+      #   run: echo '${{ inputs.containers }}' > containers.json
+
+      # Step 2: Set up .NET Core SDK
+      - name: Setup .NET Core SDK 8.0.405
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.405'
+
+      - name: 'Login to Azure'
+        uses: azure/login@v2
+        with:
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-id: ${{ secrets.MANAGED_IDENTITY_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  
+      - name: Restore dotnet
+        run: |
+          dotnet restore $GITHUB_WORKSPACE/.github/workflows/resources/seedData-cosmosDb/SeedDataCosmosDb.csproj
+
+      - name: Build dotnet
+        run: |
+          dotnet build $GITHUB_WORKSPACE/.github/workflows/resources/seedData-cosmosDb/SeedDataCosmosDb.csproj --configuration Release
+
+      - name: Run dotnet
+        run: |
+          dotnet run --project $GITHUB_WORKSPACE/.github/workflows/resources/seedData-cosmosDb/SeedDataCosmosDb.csproj -- "${{ secrets.COSMOSDB_CONNECTION_STRING }}" ${{ vars.DATABASE_NAME }} $GITHUB_WORKSPACE/.github/workflows/resources/DbDeployments/seedData

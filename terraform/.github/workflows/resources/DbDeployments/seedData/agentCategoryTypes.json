@@ -1,0 +1,692 @@
+[
+  {
+    "id": "a9ffc042-6510-4748-aa8a-6c81bb8b9cdf",
+    "category": "Tax Reporting & Provision",
+    "isActive": true
+  },
+  {
+    "id": "b8f11b0d-084e-4257-b986-082e01461114",
+    "category": "Statutory Accounting",
+    "isActive": true
+  },
+  {
+    "id": "1211da29-b7c5-41bd-a2fe-89c90e4f5e5e",
+    "category": "Income Tax",
+    "isActive": true
+  },
+  {
+    "id": "7fc970c1-4e93-448b-b0c8-e7aabfd1b60d",
+    "category": "Value Added Tax",
+    "isActive": true
+  },
+  {
+    "id": "0ac83c20-448e-4488-98e4-eedec1501a55",
+    "category": "Sales Tax",
+    "isActive": true
+  },
+  {
+    "id": "fdfbe7ce-f942-4b35-a0f7-81172faaf96d",
+    "category": "Payroll",
+    "isActive": true
+  },
+  {
+    "id": "d7baa7c6-a7ec-4668-9d47-82cdd0c7dc4c",
+    "category": "Individual",
+    "isActive": true
+  },
+  {
+    "id": "9bea375e-d946-4926-ad3f-96fa6cd0a7ae",
+    "category": "Tax Controversy",
+    "isActive": true
+  },
+  {
+    "id": "61361038-4136-4309-a486-58e2dbea9ef5",
+    "category": "Tax Planning",
+    "isActive": true
+  },
+  {
+    "id": "d93e5cd3-8fa4-48dc-8c55-8a37f8eb27e0",
+    "category": "Transfer Pricing",
+    "isActive": true
+  },
+  {
+    "id": "097d0eb6-8a0c-404a-aac9-468654c69718",
+    "category": "Tax Management",
+    "isActive": true
+  },
+  {
+    "id": "8adb02dc-5931-4a08-b89e-45d68d493bf4",
+    "category": "Bookkeeping",
+    "isActive": true
+  },
+  {
+    "id": "6148df4d-7522-4d5d-99cd-a15cf2e60d93",
+    "category": "Country by Country Reporting",
+    "isActive": true
+  },
+  {
+    "id": "c32781f7-eedd-483c-8c76-0be5ac78e89d",
+    "category": "Customs",
+    "isActive": true
+  },
+  {
+    "id": "700872c9-da42-4924-8e21-69db2042904f",
+    "category": "HR/Benefits/Talent",
+    "isActive": true
+  },
+  {
+    "id": "a5bf2f38-90b2-4173-80a8-04fa7e312845",
+    "category": "Immigration",
+    "isActive": true
+  },
+  {
+    "id": "da695958-e235-46d2-b2a2-1610366ece8c",
+    "category": "Data and Governance",
+    "isActive": true
+  },
+  {
+    "id": "a644dc32-3022-462b-b0c2-8c2fe1285392",
+    "category": "Process Agent",
+    "isActive": true
+  },
+  {
+    "id": "1183957d-768c-4e70-bdae-a8b0f295e661",
+    "category": "Plugin Agents",
+    "isActive": true
+  },
+  {
+    "id": "5f408a78-067f-4ae7-91e0-1fd74e879028",
+    "category": "Trial Balance",
+    "isActive": true
+  },
+  {
+    "id": "02af2615-5f73-4e61-ba98-921025de608f",
+    "category": "UPES - AREC Processes",
+    "isActive": true
+  },
+  {
+    "id": "f68afb23-8bf4-48fe-8197-1e0201a6aa3d",
+    "category": "W9 Information",
+    "isActive": true
+  },
+  {
+    "id": "7529c388-5ad0-4051-958f-f522923c011c",
+    "category": "Notices-AI",
+    "isActive": true
+  },
+  {
+    "id": "b3de443d-31e9-4f87-97ac-b9e86c049c5b",
+    "category": "ETL",
+    "isActive": true
+  },
+  {
+    "id": "c10595e7-f1e5-40b8-b961-4c9f0c5b6c9e",
+    "category": "project managment",
+    "isActive": true
+  },
+  {
+    "id": "7b82089d-93c8-4e84-ac03-07c1565d7bec",
+    "category": "Classify Docs",
+    "isActive": true
+  },
+  {
+    "id": "28348504-df4a-4c76-b823-5fa6ccd96726",
+    "category": "Plugin Agents",
+    "isActive": true
+  },
+  {
+    "id": "964ca334-6484-44a7-adb4-1a06d213977c",
+    "category": "Data Analysis Tool",
+    "isActive": true
+  },
+  {
+    "id": "eeef9069-9510-4a69-9619-d701b0babc38",
+    "category": "Agent Creation",
+    "isActive": true
+  },
+  {
+    "id": "9c941b3f-d9bf-451d-85de-5d5e8577c5b7",
+    "category": "Project Management Office",
+    "isActive": true
+  },
+  {
+    "id": "0c47ed62-8d6c-4560-91c8-2a8699d3e51d",
+    "category": "Business License",
+    "isActive": true
+  },
+  {
+    "id": "95d4b95c-a375-4f7d-b737-a3e98c1248c4",
+    "category": "General",
+    "isActive": true
+  },
+  {
+    "id": "4eab2280-076b-4a10-9151-90d8950f5c61",
+    "category": "Agent Creator",
+    "isActive": true
+  },
+  {
+    "id": "63b557f1-b50b-4215-8148-863eacb8dad2",
+    "category": "Notices AI",
+    "isActive": true
+  },
+  {
+    "id": "935c2161-d070-4449-a2c5-78d74d54ca76",
+    "category": "Specialist",
+    "isActive": true
+  },
+  {
+    "id": "b2f72879-17a6-4b7f-bcb1-dc6de0c9847b",
+    "category": "Individual Income Tax",
+    "isActive": true
+  },
+  {
+    "id": "0b8ab9fb-7c8b-40ce-88dc-4d3400e1b061",
+    "category": "Trial Balance",
+    "isActive": true
+  },
+  {
+    "id": "6f7367c5-6cec-4744-b540-d7e951278308",
+    "category": "NY Comparison",
+    "isActive": true
+  },
+  {
+    "id": "52510894-b80a-418b-bda0-407d8090a503",
+    "category": "5471",
+    "isActive": true
+  },
+  {
+    "id": "4ffda15d-c76e-49b7-88e6-3a1facfeabe9",
+    "category": "8986",
+    "isActive": true
+  },
+  {
+    "id": "57043ad5-ed50-4f42-b137-f5a45a2c08f9",
+    "category": "MAD",
+    "isActive": true
+  },
+  {
+    "id": "3219cd51-0760-4cde-9101-b24262486997",
+    "category": "tax prep",
+    "isActive": true
+  },
+  {
+    "id": "ee9b5454-4030-4008-8b5d-d8ca6a6ed10e",
+    "category": "Schedule IW",
+    "isActive": true
+  },
+  {
+    "id": "a1e2001c-1509-437d-89d1-2af982128412",
+    "category": "BCM",
+    "isActive": true
+  },
+  {
+    "id": "4eb507d1-3601-4f73-a519-54e6dbb4a18e",
+    "category": "Method Scraping",
+    "isActive": true
+  },
+  {
+    "id": "c3f7d332-d182-4cf9-a3cb-45272a30e71c",
+    "category": "XML Recon",
+    "isActive": true
+  },
+  {
+    "id": "e29ec2aa-9610-4712-9639-158c498d5782",
+    "category": "UPES - AREC Processes",
+    "isActive": true
+  },
+  {
+    "id": "ae922d6e-24af-43c2-acd1-84ef66ccc421",
+    "category": "ACA",
+    "isActive": true
+  },
+  {
+    "id": "ea2c3ce7-fca5-4d17-a1da-4c90bfbb148a",
+    "category": "Reference",
+    "isActive": true
+  },
+  {
+    "id": "6664cfd0-c0b6-4c74-8cb2-60dc9719ddba",
+    "category": "Test",
+    "isActive": true
+  },
+  {
+    "id": "fb01cd56-28a4-4828-90f3-ecd8024ea8d6",
+    "category": "WOTC",
+    "isActive": true
+  },
+  {
+    "id": "013f3f83-615b-4b77-b60e-93dcf805017e",
+    "category": "GTP",
+    "isActive": true
+  },
+  {
+    "id": "cc14b069-509f-4aea-96a8-cfdbcb9f13a3",
+    "category": "WOTC - SWAT Team",
+    "isActive": true
+  },
+  {
+    "id": "ac8a0e33-f166-4604-a433-08eee20660d8",
+    "category": "Engagement Management",
+    "isActive": true
+  },
+  {
+    "id": "9b88798f-44ff-4616-a216-149c63e1097a",
+    "category": "Methods",
+    "isActive": true
+  },
+  {
+    "id": "d40edebe-50ee-4622-a08b-2f803aff72f3",
+    "category": "Tax Opinion Assistant",
+    "isActive": true
+  },
+  {
+    "id": "572bf21f-60d5-48f5-8a63-a45d698dba36",
+    "category": "1120 Attachments/Statements",
+    "isActive": true
+  },
+  {
+    "id": "356d3bef-f2fe-4ad7-9387-78220dce525d",
+    "category": "Prompt optimisation",
+    "isActive": true
+  },
+  {
+    "id": "01c94986-7569-4457-b335-6c2f276ea2b1",
+    "category": "Ticketing Support",
+    "isActive": true
+  },
+  {
+    "id": "63598176-89cd-4aca-92c6-a357fb8b9d80",
+    "category": "Tax Engagement Planning",
+    "isActive": true
+  },
+  {
+    "id": "90fa2200-136b-4f13-9bd9-aa2a1ca4a012",
+    "category": "Meta Data",
+    "isActive": true
+  },
+  {
+    "id": "01f60574-3c26-4e0c-8aab-9f1b08c8c317",
+    "category": "State Return",
+    "isActive": true
+  },
+  {
+    "id": "70c1ade3-53c7-4a16-aea5-0a8261146d76",
+    "category": "Law",
+    "isActive": true
+  },
+  {
+    "id": "ea9c47bc-236d-43c5-afae-5ab2cc241f03",
+    "category": "TTA Attribute",
+    "isActive": true
+  },
+  {
+    "id": "5fa73617-024d-4ae1-94a5-19d3462acd50",
+    "category": "e-file",
+    "isActive": true
+  },
+  {
+    "id": "c97dad66-60c2-4f6e-b30a-5a612775315d",
+    "category": "Azure 365",
+    "isActive": true
+  },
+  {
+    "id": "d87c55b1-2b09-4149-8cd4-c003561e80c2",
+    "category": "GTP Onboarding",
+    "isActive": true
+  },
+  {
+    "id": "6961f695-a5f2-4a60-b7ec-c91fe985e205",
+    "category": "UPES - Consulting",
+    "isActive": true
+  },
+  {
+    "id": "6ab06ef8-2250-4306-80d4-4c7bc191fbdf",
+    "category": "Tax Calculations",
+    "isActive": true
+  },
+  {
+    "id": "0b5e3ea3-8f65-4f88-b5a2-8a3af80cc6e6",
+    "category": "Indirect Transactions",
+    "isActive": true
+  },
+  {
+    "id": "4f380fbb-4eed-44d7-b928-1721af18e68a",
+    "category": "Notice",
+    "isActive": true
+  },
+  {
+    "id": "94d6f21f-2b30-4150-a4e4-2a9086c31e56",
+    "category": "OTP",
+    "isActive": true
+  },
+  {
+    "id": "d5361e8c-545e-430e-8290-2ad70b5490ca",
+    "category": "Risk",
+    "isActive": true
+  },
+  {
+    "id": "0fcf9892-a675-47a6-b0c1-a578f9121665",
+    "category": "Coding",
+    "isActive": true
+  },
+  {
+    "id": "f6ba850a-39f5-4ccc-b3e7-3722358084af",
+    "category": "Tax Return Statements/Attachments",
+    "isActive": true
+  },
+  {
+    "id": "f44cb17a-be4b-48d9-ab65-9af0ce337ea1",
+    "category": "Utils",
+    "isActive": true
+  },
+  {
+    "id": "86065800-7f3d-4ce7-8a59-0805883b8455",
+    "category": "CT Transmittal",
+    "isActive": true
+  },
+  {
+    "id": "9e6a9e8d-0fb7-43e9-8d66-412ab3700595",
+    "category": "BEPS",
+    "isActive": true
+  },
+  {
+    "id": "fedb0fe0-6bf4-4488-bdcd-3dd433b84064",
+    "category": "Indirect Tax",
+    "isActive": true
+  },
+  {
+    "id": "b36ac94f-042d-47c5-ba24-b4edff0136cb",
+    "category": "Data Extraction",
+    "isActive": true
+  },
+  {
+    "id": "e9eac9a4-b4be-48f2-9534-0d427ac5f321",
+    "category": "Withholding Tax ( Vendor Onboarding process)",
+    "isActive": true
+  },
+  {
+    "id": "f46dd7e1-f7bf-401c-8578-6307460aed4a",
+    "category": "Indirect Tax Tax Engine",
+    "isActive": true
+  },
+  {
+    "id": "f8a581fe-2d81-46ed-96bd-5eda1f3925b3",
+    "category": "Guidance",
+    "isActive": true
+  },
+  {
+    "id": "8621af4c-e479-4ef7-af0b-a354b867ec5b",
+    "category": "1065",
+    "isActive": true
+  },
+  {
+    "id": "bf5be791-9640-4382-bcd1-520f7fb573a0",
+    "category": "Financial Statements",
+    "isActive": true
+  },
+  {
+    "id": "2bbf66da-2725-483e-a83f-b74483f47961",
+    "category": "Attribute Mapper",
+    "isActive": true
+  },
+  {
+    "id": "de9eb28a-1972-4c7e-b073-823b783785f6",
+    "category": "Depreciation",
+    "isActive": true
+  },
+  {
+    "id": "4c3f036f-56e1-47a8-9514-70d4a268772f",
+    "category": "EMEIA",
+    "isActive": true
+  },
+  {
+    "id": "1698dee5-47ba-48a4-b56c-52c2c80cb210",
+    "category": "TAM Support",
+    "isActive": true
+  },
+  {
+    "id": "5f66df68-f4d2-4ad7-b3bd-cb85b783e02e",
+    "category": "Data Standards",
+    "isActive": true
+  },
+  {
+    "id": "3387fb68-f22e-459b-8ef4-8acdb0616fc1",
+    "category": "Global Tax News Updates",
+    "isActive": true
+  },
+  {
+    "id": "ca1b0dc6-6930-4247-b25c-670581533d59",
+    "category": "Classify Data Records",
+    "isActive": true
+  },
+  {
+    "id": "f6502cee-1d57-4c3c-b426-5276b923295f",
+    "category": "Margin Improvement",
+    "isActive": true
+  },
+  {
+    "id": "b0ef7f14-7506-4504-bb1e-0db2398f6857",
+    "category": "NAFTA Query",
+    "isActive": true
+  },
+  {
+    "id": "06e32ea4-b150-4ded-adf5-24b6f4c1f7c0",
+    "category": "Project Classifier",
+    "isActive": true
+  },
+  {
+    "id": "56960310-3c12-425c-beee-31ca95013d3b",
+    "category": "GTM",
+    "isActive": true
+  },
+  {
+    "id": "685884b3-8dd5-4db6-8fe8-810ffc80757a",
+    "category": "SALT",
+    "isActive": true
+  },
+  {
+    "id": "627febd0-7457-49b5-87b1-c783b77582be",
+    "category": "1120",
+    "isActive": true
+  },
+  {
+    "id": "9a48eacd-752a-4180-bf7f-0a80a30fb367",
+    "category": "Withholding Tax",
+    "isActive": true
+  },
+  {
+    "id": "0f279ebc-54e8-4f81-a279-cd37416b0e0d",
+    "category": "Business Traveler",
+    "isActive": true
+  },
+  {
+    "id": "a37e073d-5efb-4de5-9dcc-515f0caf82d5",
+    "category": "Document Management",
+    "isActive": true
+  },
+  {
+    "id": "949c09dc-6f78-4181-9860-591352d3df06",
+    "category": "Special Allocation",
+    "isActive": true
+  },
+  {
+    "id": "e62dfe36-d8e3-4a4b-9e01-ccfb3d121c6d",
+    "category": "Document Comparison",
+    "isActive": true
+  },
+  {
+    "id": "4aa3f1a9-1f37-4978-bee0-fe52e3a4218a",
+    "category": "TTT",
+    "isActive": true
+  },
+  {
+    "id": "2b8d5293-fe1a-47a3-8c08-99d6a0610f5b",
+    "category": "AI Factory",
+    "isActive": true
+  },
+  {
+    "id": "b3ba356f-38c6-420a-925f-8944d8b5e3cb",
+    "category": "Knowledge",
+    "isActive": true
+  },
+  {
+    "id": "5592c485-a430-4d4d-b460-9874444cdd20",
+    "category": "TTOC",
+    "isActive": true
+  },
+  {
+    "id": "cfdbc98c-6a8f-4cc8-89d3-e48c9f31234f",
+    "category": "Tax Return Reviewer",
+    "isActive": true
+  },
+  {
+    "id": "97a4fe4e-4932-417f-ad9c-18e67a6ab543",
+    "category": "RunBook",
+    "isActive": true
+  },
+  {
+    "id": "c936482d-0c7a-465e-a36e-3bc051cd3a95",
+    "category": "SOW",
+    "isActive": true
+  },
+  {
+    "id": "371a0dc3-c105-4b07-bf97-2dd2742a55ff",
+    "category": "TAX Chat Assistant",
+    "isActive": true
+  },
+  {
+    "id": "2125ddca-2245-4114-8686-809f4e19bd57",
+    "category": "File Comparison Tool",
+    "isActive": true
+  },
+  {
+    "id": "47a03da9-c4d1-4cbd-950f-55de2b3c1542",
+    "category": "Test Canada Agent",
+    "isActive": true
+  },
+  {
+    "id": "a6d4c594-ef1d-44c4-8a3f-eb2107f6dc75",
+    "category": "TTAR",
+    "isActive": true
+  },
+  {
+    "id": "d404c7d6-8348-4200-a221-c292210d3a09",
+    "category": "Tax",
+    "isActive": true
+  },
+  {
+    "id": "cf93ecdd-c43c-40b7-b708-c7ffed948594",
+    "category": "TestCatg_T19_MR",
+    "isActive": true
+  },
+  {
+    "id": "8551c488-1dbc-40ba-a0fa-ec0b8ab5e2ab",
+    "category": "SPS",
+    "isActive": true
+  },
+  {
+    "id": "74779540-5087-4584-ba6b-2a1a4f14644d",
+    "category": "MISC",
+    "isActive": true
+  },
+  {
+    "id": "9750877f-fb7d-431f-995a-188cede0a26e",
+    "category": "Error Log",
+    "isActive": true
+  },
+  {
+    "id": "5f7ab8f2-ebcb-4942-ae94-cbf0e9974f4a",
+    "category": "Learning Compliance",
+    "isActive": true
+  },
+  {
+    "id": "0b99e174-f8f1-480f-ae4a-7e1c9e016ee1",
+    "category": "State Incentive",
+    "isActive": true
+  },
+  {
+    "id": "28ef6f8f-063f-4c18-b201-2bd285b11bdc",
+    "category": "Knowledge Management",
+    "isActive": true
+  },
+  {
+    "id": "0ec88813-e3e5-4c05-ba1e-e4e74a0d7705",
+    "category": "Reporting",
+    "isActive": true
+  },
+  {
+    "id": "61adbf6d-3b5c-476a-96da-48f3b6ed3fa1",
+    "category": "Custom Solution and Agent",
+    "isActive": true
+  },
+  {
+    "id": "638cbfdf-b5b3-448a-95ad-2c238b0b00cd",
+    "category": "Data Analysis",
+    "isActive": true
+  },
+  {
+    "id": "c81c7dc0-137e-4a1c-8c7d-9669f05cccc5",
+    "category": "Supplier Invoice Detail Extraction",
+    "isActive": true
+  },
+  {
+    "id": "d4828bb7-03a2-4dd9-9c31-a5dbfcb8bcf2",
+    "category": "Classification",
+    "isActive": true
+  },
+  {
+    "id": "b3920670-82ed-47b3-b9d6-4bd248a3e2a1",
+    "category": "Client Engagement",
+    "isActive": true
+  },
+  {
+    "id": "0e3af61a-889f-4ccd-9c0a-5b91f7704667",
+    "category": "Compliance & Regulatory",
+    "isActive": true
+  },
+  {
+    "id": "da3a48da-2a58-4384-8472-8a4b905e2321",
+    "category": "Custom Solutions & Agents",
+    "isActive": true
+  },
+  {
+    "id": "058317ea-3243-4d2b-a3a4-04b2ca33faaa",
+    "category": "Data Management & Governance",
+    "isActive": true
+  },
+  {
+    "id": "593a3638-d5cb-43e1-8831-6f859653bbd8",
+    "category": "Financial Management & Reporting",
+    "isActive": true
+  },
+  {
+    "id": "04d2b47d-f192-4cc2-a593-bf4590fd1908",
+    "category": "Human Resources & Talent Management",
+    "isActive": true
+  },
+  {
+    "id": "d80701c1-827a-4c41-b8b1-d63d22a1f45d",
+    "category": "Operational Efficiency & Process Improvement",
+    "isActive": true
+  },
+  {
+    "id": "ed00757d-b32a-4e57-9a2d-71f0971a393b",
+    "category": "Performance Measurement & Analysis",
+    "isActive": true
+  },
+  {
+    "id": "f8bccb9c-c61e-40da-8aca-6b29307d162c",
+    "category": "Risk Management & Mitigation",
+    "isActive": true
+  },
+  {
+    "id": "ec6fd3d3-6db8-420e-9f75-8930aab9f1f9",
+    "category": "Tax Planning & Strategy",
+    "isActive": true
+  },
+  {
+    "id": "4ff31dcc-7d7f-4595-8033-0254223c4eeb",
+    "category": "Technology Integration & Support",
+    "isActive": true
+  }
+]

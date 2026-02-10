@@ -1,0 +1,123 @@
+[
+    {
+        "controllers": [
+            "Justin Peek",
+            "Adam Jones",
+            "Todd Carroll",
+            "Josh Guertler",
+            "Mike Johnson"
+        ],
+        "id": "7733b46a-aa78-4d8a-a640-3aed958801b0",
+        "name": "LAB",
+        "steps": [
+          {
+            "approvalFlow": false,
+            "default": true,
+            "id": "3fa4bc42-6d0c-4f73-89ae-621f288101a9",
+            "name": "Sandbox",
+            "title": "Sandbox",
+            "nextActionDescription": "To progress the agent, request an Editor Concierge be assigned to your agent.",
+            "order": 1,
+            "tooltip": "Sandbox\nThis is the initial development stage where agents are created and configured. Agents in the Sandbox can only use synthesized data and are not connected to live systems. An Editor Concierge must be assigned to progress beyond this stage. You may request an Editor Concierge using the EYQ Agent Studio Support Teams Channel"
+          },
+          {
+            "action": "Promote",
+            "approvalFlow": true,
+            "checkboxes": [
+              {
+                "id": "7f3c1c8e-2a41-4c6e-9f32-bc2e004a8d2c",
+                "name": "Pending Plugin Dev (optional).",
+                "required": false
+              },
+              {
+                "id": "e1a92d3b-8b44-4f98-9f70-1c0c9ec49e4b",
+                "name": "QA Pair testing completed.",
+                "required": true
+              },
+              {
+                "id": "0c6c8f3b-2fdd-43ac-a6bc-a24a8d52c1c7",
+                "name": "Technical/PPMD Sign off.",
+                "required": true
+              },
+              {
+                "id": "b94de1f0-6c1a-4c52-9d7d-3b7f8ecb55e1",
+                "name": "Agent Acceptance requirements submitted.",
+                "required": true
+              },
+              {
+                "id": "d3d7aa62-9218-4c3a-9c85-1ef88278eb49",
+                "name": "Approved by AAP committee.",
+                "required": true
+              }
+            ],
+            "default": false,
+            "id": "5f7eb2e1-af80-4697-b55d-aa29908c613c",
+            "name": "Proof of Concept and Q&A Pairs Testing",
+            "title": "Proof of Concept and QA Pairs Testing",
+            "nextActionDescription": "When stage requirements complete, Author submits for Editor approval.",
+            "order": 2,
+            "tooltip": "Proof of Concept and QA Pairs Testing\nThis phase validates the agent's value proposition, use case viability, and organizational alignment while testing Q&A pairs for reliability and accuracy. Stakeholders review documentation and confirm agents readiness to progress.\nAgent Approval Process\nThe Agent Approval Process (AAP) governs approval for agents use in production and begins at this stage. Technical reviewers assess security compliance, data governance, architecture, and adherence to organizational standards. Promotion to the Pilot environment requires AI Factory Controller approval.\nStage Completion Requirements\nThis stage contains six mandatory steps that are tracked and reported. You are responsible for marking a check on each step once it is completed saving progress as you progress. You cannot progress until all six steps are complete. Accurate progression reporting enables leadership to monitor agent velocity and identify bottlenecks.\n⚡ Progressing the Agent Requires:\nSubmit the business case documentation, execute the full test suite with the required pass rate, complete the Agent Approval Process, and secure Factory Controller approval."
+          }
+        ],
+        "tooltip": "About the Lab Stage\nThe Lab is the environment where agents are developed, configured, and associated with skills. While in the Lab, agents can only operate using synthesized data and are not connected to live production systems. Agents need an editor or concierge support person assigned in order to proceed from the Sandbox stage. You can request an editor or concierge for your agent using the EYQ Agent Studio support channel."
+    },
+    {
+        "controllers": [
+            "Justin Peek",
+            "Adam Jones",
+            "Todd Carroll",
+            "Josh Guertler",
+            "Mike Johnson"
+        ],
+        "id": "f3118cf7-2560-45bc-9e96-37e694db64ca",
+        "name": "PILOT",
+        "steps": [
+          {
+            "approvalFlow": false,
+            "default": true,
+            "id": "4336d16f-df1a-443a-a950-f8585b1bed46",
+            "name": "5 Star Rating",
+            "title": "5 Star Rating",
+            "nextActionDescription": "Editor is responsible for verifying feedback ratings and marking complete.",
+            "order": 3,
+            "tooltip": "5 Star Rating\nTest the agent with client data and select user groups to gather real-world feedback, monitor performance, and validate business value. Participants provide ratings for the agent in the pilot environment, which accumulate into an average 5-star rating that reflects overall effectiveness and usability.\nProgressing the Agent Requires: Coordinate with user groups in the pilot environment, collect feedback, and meet satisfaction criteria to proceed."
+          },
+          {
+            "action": "Publish",
+            "approvalFlow": true,
+            "default": false,
+            "id": "92ea9730-bc7e-4a5e-a81c-6917732e741f",
+            "name": "AI Quality & Risk Management",
+            "title": "AI Quality & Risk Management",
+            "nextActionDescription": "After completing all stage requirements, the Author submits for Editor approval to promote the agent to Production.",
+            "order": 4,
+            "tooltip": "AI Quality and Risk Management\nGovernance review evaluating AI model risk, bias assessment, ethical considerations, regulatory compliance, and ongoing monitoring requirements before production release.\nProgressing the Agent Requires:\nSubmit the AI risk assessment and monitoring plan, then await approval before publishing your agent."
+          }
+        ],
+        "tooltip": "Pilot Stage\nIn the Pilot stage, agents can use real client data and undergo performance testing to confirm that functionality and reliability are maintained under real-world scenarios. This phase validates business value and ensures the agent performs as expected before full deployment."
+    },
+    {
+        "controllers": [
+            "Justin Peek",
+            "Adam Jones",
+            "Todd Carroll",
+            "Josh Guertler",
+            "Mike Johnson"
+        ],
+        "id": "6aed202e-1fbb-420c-ac35-e6c588aae5f3",
+        "name": "PRODUCTION",
+        "steps": [
+          {
+            "approvalFlow": false,
+            "default": true,
+            "id": "634672ef-789c-41bb-ba98-844118e4b4d2",
+            "name": "Production Deployment",
+            "title": "Production Deployment",
+            "nextActionDescription": "",
+            "order": 5,
+            "tooltip": "Production Deployment\nSuccessfully deployed to the production environment with full availability to all authorized users for organizational use.\n⚡ Managing the Agent:\nMonitor production performance and user feedback and maintain ongoing compliance. A member of the platform team will complete a manual human in the loop push, status will be pending governance until complete"
+          }
+        ],
+        "tooltip": ""
+    }
+]

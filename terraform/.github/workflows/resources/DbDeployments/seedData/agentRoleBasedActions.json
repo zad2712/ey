@@ -1,0 +1,302 @@
+[
+  {
+    "id": "f35014f5-1d48-4dae-97b1-803bfefdcabb",
+    "role": "Author",
+    "agentActions": [
+      {
+        "agentEnvironment": "Lab",
+        "actions": [
+          {
+            "agentState": "Draft",
+            "actionValues": [
+              "Modify",
+              "Request Promotion",
+              "Clone Agent"
+            ]
+          },
+          {
+            "agentState": "Pending Promotion",
+            "actionValues": [
+              "Decline Promotion"
+            ]
+          },
+          {
+            "agentState": "Archived",
+            "actionValues": [
+              "View Agent",
+              "New Iteration",
+              "Clone Agent",
+              "Request Withdraw"
+            ]
+          },
+          {
+            "agentState": "Pending Withdrawal",
+            "actionValues": [
+              "Decline Withdraw"
+            ]
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Pilot",
+        "actions": [
+          {
+            "agentState": "Piloting",
+            "actionValues": [
+              "Request Publish",
+              "Modify Name"
+            ]
+          },
+          {
+            "agentState": "Pending Publication",
+            "actionValues": [
+              "Decline Publish",
+              "Modify Name"
+            ]
+          },
+          {
+            "agentState": "Published",
+            "actionValues": []
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Production",
+        "actions": [
+          {
+            "agentState": "Published",
+            "actionValues": [
+              "Suspend"
+            ]
+          },
+          {
+            "agentState": "Suspended",
+            "actionValues": [
+              "Request Activate"
+            ]
+          },
+          {
+            "agentState": "Pending Activation",
+            "actionValues": [
+              "Decline Activate"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "44900e68-26c3-4705-a82f-03a69f68c8ed",
+    "role": "Editor",
+    "agentActions": [
+      {
+        "agentEnvironment": "Lab",
+        "actions": [
+          {
+            "agentState": "Draft",
+            "actionValues": [
+              "Modify",
+              "Promote",
+              "Clone Agent"
+            ]
+          },
+          {
+            "agentState": "Pending Promotion",
+            "actionValues": [
+              "View Agent",
+              "Promote",
+              "Decline Promotion"
+            ]
+          },
+          {
+            "agentState": "Archived",
+            "actionValues": [
+              "View Agent",
+              "New Iteration",
+              "Clone Agent",
+              "Withdraw"
+            ]
+          },
+          {
+            "agentState": "Pending Withdrawal",
+            "actionValues": [
+              "Withdraw",
+              "Decline Withdraw"
+            ]
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Pilot",
+        "actions": [
+          {
+            "agentState": "Piloting",
+            "actionValues": [
+              "Publish",
+              "Modify Name"
+            ]
+          },
+          {
+            "agentState": "Pending Publication",
+            "actionValues": [
+              "Publish",
+              "Decline Publish",
+              "Modify Name"
+            ]
+          },
+          {
+            "agentState": "Published",
+            "actionValues": []
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Production",
+        "actions": [
+          {
+            "agentState": "Published",
+            "actionValues": [
+              "Suspend"
+            ]
+          },
+          {
+            "agentState": "Suspended",
+            "actionValues": [
+              "Activate"
+            ]
+          },
+          {
+            "agentState": "Pending Activation",
+            "actionValues": [
+              "Activate",
+              "Decline Activate"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dc8fd6ac-2c12-46f1-98a1-396f2c53c64f",
+    "role": "Team Author",
+    "agentActions": [
+      {
+        "agentEnvironment": "Lab",
+        "actions": [
+          {
+            "agentState": "Draft",
+            "actionValues": [
+              "View Agent"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fcd71a70-cab7-47fa-8b04-577f39207a1b",
+    "role": "Admin",
+    "agentActions": [
+      {
+        "agentEnvironment": "Lab",
+        "actions": [
+          {
+            "agentState": "Draft",
+            "actionValues": [
+              "Modify",
+              "Promote",
+              "Clone Agent",
+              "Agent History",
+              "Delete (All)"
+            ]
+          },
+          {
+            "agentState": "Pending Promotion",
+            "actionValues": [
+              "View Agent",
+              "Promote",
+              "Decline Promotion",
+              "Agent History"
+            ]
+          },
+          {
+            "agentState": "Archived",
+            "actionValues": [
+              "View Agent",
+              "New Iteration",
+              "Clone Agent",
+              "Withdraw",
+              "Agent History",
+              "Delete (All)"
+            ]
+          },
+          {
+            "agentState": "Pending Withdrawal",
+            "actionValues": [
+              "Withdraw",
+              "Decline Withdraw",
+              "Agent History"
+            ]
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Pilot",
+        "actions": [
+          {
+            "agentState": "Piloting",
+            "actionValues": [
+              "Publish",
+              "Modify Name",
+              "Agent History",
+              "Delete"
+            ]
+          },
+          {
+            "agentState": "Pending Publication",
+            "actionValues": [
+              "Publish",
+              "Decline Publish",
+              "Modify Name",
+              "Agent History"
+            ]
+          },
+          {
+            "agentState": "Published",
+            "actionValues": [
+              "Agent History"
+            ]
+          }
+        ]
+      },
+      {
+        "agentEnvironment": "Production",
+        "actions": [
+          {
+            "agentState": "Published",
+            "actionValues": [
+              "Suspend",
+              "Agent History",
+              "Delete"
+            ]
+          },
+          {
+            "agentState": "Suspended",
+            "actionValues": [
+              "Activate",
+              "Agent History"
+            ]
+          },
+          {
+            "agentState": "Pending Activation",
+            "actionValues": [
+              "Activate",
+              "Decline Activate",
+              "Agent History"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

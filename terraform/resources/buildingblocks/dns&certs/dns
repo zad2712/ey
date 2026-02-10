@@ -1,0 +1,52 @@
+##### DNS
+# EY Fabric DNS Management Documentation: https://explore.eyfabric.ey.com/eydx/docs/DNS-Records-Management
+# EY Fabric Ansible DNS Management Documentation: https://explore.eyfabric.ey.com/eydx/content/48b1d187-dd8e-4348-9403-f753e57bbe80
+
+
+##### External CNAME DNS Record
+# This Ansible Payload creates an external CNAME DNS record for the EYx development environment.
+# This should point to EYQ's Front Door service in the corresponding Environment.
+var_action: add
+var_deployment_id: <deployment-id>
+var_owner: dante.ciai@gds.ey.com; juan.mercade@gds.ey.com; gustavo.sosa@gds.ey.com
+var_owner_group: D-UG-Fabric-IL-EYQ-EYX-Engineering.GID
+var_fqdn: <EYX-FQDN>
+var_parent_zone: ey.com
+var_value: <Front Door URL>
+var_record_type: CNAME
+var_view: external
+
+
+
+##### Internal A DNS Record
+# This Ansible payload creates an internal A DNS record for Private Endpoints in the EYx development environment.
+# Each Azure Resource that requires a Private Endpoint should have its own A DNS record.
+# These records are used to resolve the FQDNs through the F5 VPN.
+# Supported Zones are documented here: https://explore.eyfabric.ey.com/eydx/content/9c90f3c2-cdaf-4cde-9cff-02be62657938
+# Make sure to replace the placeholders with the actual values before running the job.
+# The fqdn should be the Private Endpoint FQDN
+# Some resources 
+var_action: add
+var_fqdn: <resource-private-endpoint-FQDN>
+var_owner: juan.mercade@gds.ey.com
+var_owner_group: D-UG-Fabric-IL-EYQ-EYX-Engineering.GID
+var_record_type: A
+var_value: <private-endpoint-IP>
+var_view: internal
+var_deployment_id: <deployment-id>
+
+
+##### TXT DNS Record
+# This Ansible payload creates a TXT DNS record.
+# This is used to verify the domain ownership for the EYx development environment.
+# Generally we use this when verifying Front Door or APIM ownership.
+# Make sure to replace the placeholders with the actual values before running the job.
+var_action: add
+var_deployment_id: <deployment-id>
+var_owner: dante.ciai@gds.ey.com; juan.mercade@gds.ey.com; gustavo.sosa@gds.ey.com
+var_owner_group: D-UG-Fabric-IL-EYQ-EYX-Engineering.GID
+var_fqdn: <fqdn-provided-by-azure-resource-when-configuring>
+var_parent_zone: ey.com
+var_value: <txt-record-value-provided-by-azure-resource-when-configuring>
+var_record_type: TXT
+var_view: external

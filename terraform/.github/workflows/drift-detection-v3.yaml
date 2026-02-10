@@ -1,0 +1,160 @@
+name: 🔍 Drift Detection Matrix v3
+
+on:
+  # Scheduled drift detection (weekly on Sunday at 6 AM UTC)
+  schedule:
+    - cron: '0 6 * * 0'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: 'Layer to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - app
+          - backend
+          - config
+          - core
+          - network
+        default: all
+      
+      environment:
+        description: 'Environment to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - dev1
+          - dev2
+          - dev3
+          - qa
+          - uat-lab
+          - uat-pilot
+          - uat-prod
+          - prod-lab
+          - prod-pilot
+          - prod
+        default: all
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  # Job 1: Filter matrix combinations based on inputs
+  prepare-matrix:
+    name: 🎯 Prepare Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    
+    steps:
+      - name: Set Matrix
+        id: set-matrix
+        run: |
+          # Define all combinations
+          cat <<'EOF' > matrix.json
+          {
+            "include": [
+              {"layer": "app", "environment": "dev1", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev1.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "app", "environment": "dev2", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev2.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "app", "environment": "dev3", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev3.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "app", "environment": "qa", "env_tfvars_folder": "qa", "tfvars_file": "qa/qa.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-qa\"}"},
+              {"layer": "app", "environment": "uat-lab", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-lab.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "app", "environment": "uat-pilot", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "app", "environment": "uat-prod", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-prod.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "app", "environment": "prod-lab", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-lab.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "app", "environment": "prod-pilot", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "app", "environment": "prod", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              
+              {"layer": "backend", "environment": "dev1", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev1.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "backend", "environment": "dev2", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev2.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "backend", "environment": "dev3", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev3.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "backend", "environment": "qa", "env_tfvars_folder": "qa", "tfvars_file": "qa/qa.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-qa\"}"},
+              {"layer": "backend", "environment": "uat-lab", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-lab.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "backend", "environment": "uat-pilot", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "backend", "environment": "uat-prod", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-prod.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "backend", "environment": "prod-lab", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-lab.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "backend", "environment": "prod-pilot", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "backend", "environment": "prod", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              
+              {"layer": "config", "environment": "dev1", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev1.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "config", "environment": "dev2", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev2.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "config", "environment": "dev3", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev3.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "config", "environment": "qa", "env_tfvars_folder": "qa", "tfvars_file": "qa/qa.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-qa\"}"},
+              {"layer": "config", "environment": "uat-lab", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-lab.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "config", "environment": "uat-pilot", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "config", "environment": "uat-prod", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-prod.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "config", "environment": "prod-lab", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-lab.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "config", "environment": "prod-pilot", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "config", "environment": "prod", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              
+              {"layer": "core", "environment": "dev1", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev1.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "core", "environment": "dev2", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev2.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "core", "environment": "dev3", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev3.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "core", "environment": "uat-lab", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-lab.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "core", "environment": "uat-pilot", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "core", "environment": "uat-prod", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-prod.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "core", "environment": "prod-lab", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-lab.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "core", "environment": "prod-pilot", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "core", "environment": "prod", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              
+              {"layer": "network", "environment": "dev1", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev1.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "network", "environment": "dev2", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev2.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "network", "environment": "dev3", "env_tfvars_folder": "dev", "tfvars_file": "dev/dev3.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx\"}"},
+              {"layer": "network", "environment": "qa", "env_tfvars_folder": "qa", "tfvars_file": "qa/qa.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-qa\"}"},
+              {"layer": "network", "environment": "uat-lab", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-lab.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "network", "environment": "uat-pilot", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "network", "environment": "uat-prod", "env_tfvars_folder": "uat", "tfvars_file": "uat/uat-prod.tfvars", "runs_on": "{\"group\": \"large-runner-grp-eyx-uat\"}"},
+              {"layer": "network", "environment": "prod-lab", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-lab.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "network", "environment": "prod-pilot", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod-pilot.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"},
+              {"layer": "network", "environment": "prod", "env_tfvars_folder": "prod", "tfvars_file": "prod/prod.tfvars", "runs_on": "{\"group\": \"large-runner-vnet-eyx-prod\"}"}
+            ]
+          }
+          EOF
+          
+          # On schedule, run all
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "matrix=$(cat matrix.json | jq -c .)" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # On manual trigger, filter by inputs
+          LAYER_FILTER="${{ inputs.layer }}"
+          ENV_FILTER="${{ inputs.environment }}"
+          
+          if [[ "$LAYER_FILTER" == "all" ]] && [[ "$ENV_FILTER" == "all" ]]; then
+            # No filtering needed
+            echo "matrix=$(cat matrix.json | jq -c .)" >> $GITHUB_OUTPUT
+          else
+            # Apply filters
+            FILTERED=$(cat matrix.json | jq -c --arg layer "$LAYER_FILTER" --arg env "$ENV_FILTER" '
+              .include |= map(select(
+                (($layer == "all") or (.layer == $layer)) and
+                (($env == "all") or (.environment == $env))
+              ))
+            ')
+            echo "matrix=$FILTERED" >> $GITHUB_OUTPUT
+          fi
+
+  # Job 2: Call reusable workflow for each matrix combination
+  drift-detection:
+    name: 🔍 ${{ matrix.layer }}-${{ matrix.environment }}
+    needs: prepare-matrix
+    if: fromJson(needs.prepare-matrix.outputs.matrix).include[0] != null
+    
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
+    
+    uses: ./.github/workflows/drift-detection-reusable-v2.yml
+    with:
+      layer: ${{ matrix.layer }}
+      environment: ${{ matrix.environment }}
+      tfvars_file: ${{ matrix.tfvars_file }}
+      runs_on: ${{ matrix.runs_on }}
+    secrets: inherit

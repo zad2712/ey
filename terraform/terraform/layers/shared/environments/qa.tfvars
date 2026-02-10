@@ -1,0 +1,7 @@
+resource_group_name_admin          = "USEQCXS05HRSG02"
+resource_group_name_app            = "USEQCXS05HRSG03"
+kv_shared_admin                    = "USEQCXS05HAKV01"
+kv_shared_app                      = "USEQCXS05HAKV02"
+log_analytics_workspace_admin_name = "USEQCXS05HLAW01"
+log_analytics_workspace_app_name   = "USEQCXS05HLAW02"
+# app_insights_name                   = ""

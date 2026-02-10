@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Enforce GPG signature on all commits
+# Check if GPG signing is enabled (checks effective config value)
+GPG_SIGN_ENABLED=$(git config --get --bool commit.gpgsign 2>/dev/null)
+if [ "$GPG_SIGN_ENABLED" != "true" ]; then
+    echo "ERROR: GPG signing is required for all commits in this repository."
+    echo "Please enable GPG signing by running:"
+    echo "  git config --global commit.gpgsign true"
+    echo "Or for this repository only:"
+    echo "  git config commit.gpgsign true"
+    echo ""
+    echo "If you don't have a GPG key set up, you can create one with:"
+    echo "  gpg --gen-key"
+    echo "Then configure it with:"
+    echo "  git config --global user.signingkey <your-key-id>"
+    exit 1
+fi
+
+# Run existing git secrets check (if git-secrets is installed)
+if command -v git-secrets >/dev/null 2>&1; then
+    git secrets --pre_commit_hook -- "$@"
+fi

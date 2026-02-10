@@ -1,0 +1,20 @@
+##### DNS
+# EY Fabric Certificate Management Documentation: https://explore.eyfabric.ey.com/eydx/docs/SSL-Certificates-Management
+# EY Fabric Ansible Certificate Management Documentation: https://explore.eyfabric.ey.com/eydx/content/87eea813-bbb7-4360-a3ac-1d530a483d71
+var_application_contact: D-UG-Fabric-IL-EYQ-EYX-Engineering
+var_certificate_authority: 1
+var_certificate_name: <fqdn-certificate-name>
+var_certificate_owner: D-UG-Fabric-IL-EYQ-EYX-Engineering
+var_deployment_id: <deployment-id>
+var_device_input:
+  - PlatformType: AzureKeyVault
+    DeviceName: <key-vault-name>
+    ApplicationInput:
+      - TenantName: eygs.onmicrosoft.com
+        PasswordRequired: 1
+var_domain_name: ey.com
+var_project_chargecode: '<engagement-code>'
+var_provisioning_model: Full
+var_request_type: create
+var_schedule_request: []
+var_smu_chargecode: intellilayer

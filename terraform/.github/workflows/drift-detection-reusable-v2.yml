@@ -1,0 +1,405 @@
+name: 🔍 Drift Detection - Reusable Workflow V2
+
+on:
+  workflow_call:
+    inputs:
+      layer:
+        description: 'Terraform layer to check'
+        required: true
+        type: string
+      environment:
+        description: 'Environment name'
+        required: true
+        type: string
+      tfvars_file:
+        description: 'Path to tfvars file (relative to environments folder)'
+        required: true
+        type: string
+      runs_on:
+        description: 'Runner configuration JSON'
+        required: false
+        type: string
+        default: 'ubuntu-latest'
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  drift-check:
+    name: 🔍 ${{ inputs.layer }}-${{ inputs.environment }}
+    runs-on: ${{ inputs.runs_on && fromJson(inputs.runs_on) || 'ubuntu-latest' }}
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 'Login to Azure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Replace placeholders in provider.tf
+        run: |
+          cd ./terraform/layers/${{ inputs.layer }}
+          sed -i 's|${SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          sed -i 's|${RESOURCE_GROUP_NAME}|${{ vars.RESOURCE_GROUP_NAME }}|g' provider.tf
+          sed -i 's|${STORAGE_ACCOUNT_NAME}|${{ vars.STORAGE_ACCOUNT_NAME }}|g' provider.tf
+          sed -i 's|${TF_STATE_PATH}|${{ vars.TF_STATE_PATH }}|g' provider.tf
+          sed -i 's|${TENANT_ID}|${{ secrets.AZURE_TENANT_ID }}|g' provider.tf
+          
+          if [[ "${{ inputs.environment }}" == "dev1" || "${{ inputs.environment }}" == "dev2" || "${{ inputs.environment }}" == "dev3" ]]; then
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.BACKEND_SUBSCRIPTION_ID }}|g' provider.tf
+          else
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          fi
+
+      - name: Terraform init
+        run: |
+          cd ./terraform/layers/${{ inputs.layer }}
+          terraform init
+      
+      - name: Terraform plan for drift detection
+        working-directory: terraform/layers/${{ inputs.layer }}
+        id: drift-check
+        run: |
+          echo "🔍 Checking for configuration drift..."
+          echo "📁 Layer: ${{ inputs.layer }}"
+          echo "🌍 Environment: ${{ inputs.environment }}"
+          echo "📄 Tfvars file: ${{ inputs.tfvars_file }}"
+          
+          # Run plan to detect drift (capture exit code)
+          set +e
+          terraform plan \
+            -detailed-exitcode \
+            -out=drift-plan \
+            -var-file="environments/${{ inputs.tfvars_file }}" \
+            > plan-output.txt 2>&1
+          
+          PLAN_EXIT_CODE=$?
+          set -e
+          
+          # Exit codes: 0 = no changes, 1 = error, 2 = changes detected
+          case $PLAN_EXIT_CODE in
+            0)
+              echo "drift_status=no-drift" >> $GITHUB_OUTPUT
+              echo "✅ No drift detected"
+              exit 0
+              ;;
+            1)
+              echo "drift_status=error" >> $GITHUB_OUTPUT
+              echo "❌ Error during drift detection"
+              cat plan-output.txt
+              exit 1
+              ;;
+            2)
+              echo "drift_status=drift-detected" >> $GITHUB_OUTPUT
+              echo "⚠️ Configuration drift detected!"
+              
+              # Count changes
+              CHANGES=$(grep -E "Plan:|# " plan-output.txt | head -10 || echo "No change summary found")
+              echo "Changes summary:"
+              echo "$CHANGES"
+              exit 0
+              ;;
+          esac
+      
+      - name: 📊 Parse Drift Details
+        working-directory: terraform/layers/${{ inputs.layer }}
+        if: steps.drift-check.outputs.drift_status == 'drift-detected'
+        run: |
+          echo "📊 Analyzing drift details..."
+          
+          # Extract change summary
+          ADD_COUNT=$(grep -c "will be created" plan-output.txt 2>/dev/null || true)
+          CHANGE_COUNT=$(grep -c "will be updated" plan-output.txt 2>/dev/null || true)
+          DESTROY_COUNT=$(grep -c "will be destroyed" plan-output.txt 2>/dev/null || true)
+          
+          # Ensure counts are set (default to 0 if empty)
+          ADD_COUNT=${ADD_COUNT:-0}
+          CHANGE_COUNT=${CHANGE_COUNT:-0}
+          DESTROY_COUNT=${DESTROY_COUNT:-0}
+          
+          # Build the report
+          echo "# ⚠️ Configuration Drift Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Environment and Layer Info
+          echo "### 📋 Detection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Layer** | \`${{ inputs.layer }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | \`${{ inputs.environment }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Config File** | \`${{ inputs.tfvars_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Detection Time** | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Changes Overview
+          echo "### 📊 Changes Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Change Type | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Create | $ADD_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Modify | $CHANGE_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Delete | $DESTROY_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract and show affected resources
+          echo "### 🎯 Affected Resources" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Resources to be created
+          if [ "$ADD_COUNT" -gt 0 ]; then
+            echo "#### ➕ Resources to Create ($ADD_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be created" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Resources to be modified
+          if [ "$CHANGE_COUNT" -gt 0 ]; then
+            echo "#### 🔄 Resources to Modify ($CHANGE_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be updated" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Resources to be destroyed
+          if [ "$DESTROY_COUNT" -gt 0 ]; then
+            echo "#### ❌ Resources to Delete ($DESTROY_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be destroyed" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Action items
+          echo "### 🔧 Recommended Actions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. 📥 Download the drift plan artifact from this workflow run" >> $GITHUB_STEP_SUMMARY
+          echo "2. 🔍 Review the changes carefully to understand the drift" >> $GITHUB_STEP_SUMMARY
+          echo "3. 🤔 Determine if drift is expected or requires action:" >> $GITHUB_STEP_SUMMARY
+          echo "   - **Expected:** Update Terraform code to match infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "   - **Unexpected:** Apply Terraform to restore desired state" >> $GITHUB_STEP_SUMMARY
+          echo "4. 📝 Document the decision and actions taken" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Plan summary extract
+          echo "### 📄 Terraform Plan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to expand full plan output (first 100 lines)</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`terraform" >> $GITHUB_STEP_SUMMARY
+          head -100 plan-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 **Tip:** Full plan details are available in the uploaded artifacts" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 📊 No Drift Summary
+        if: steps.drift-check.outputs.drift_status == 'no-drift'
+        run: |
+          echo "# ✅ No Configuration Drift Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📋 Detection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Layer** | \`${{ inputs.layer }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | \`${{ inputs.environment }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Config File** | \`${{ inputs.tfvars_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Detection Time** | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ✅ **No Changes Required** |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🎉 Infrastructure State" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployed infrastructure **perfectly matches** the Terraform configuration." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ No manual changes detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ No configuration drift" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ All resources are in the desired state" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💚 **Great job!** Your infrastructure is properly managed and in sync." >> $GITHUB_STEP_SUMMARY
+      
+      - name: 💾 Upload Drift Plan
+        uses: actions/upload-artifact@v4
+        if: steps.drift-check.outputs.drift_status == 'drift-detected'
+        with:
+          name: drift-plan-${{ inputs.layer }}-${{ inputs.environment }}
+          path: terraform/layers/${{ inputs.layer }}/drift-plan
+          retention-days: 30
+      
+      - name: 📄 Upload Plan Output
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: plan-output-${{ inputs.layer }}-${{ inputs.environment }}
+          path: terraform/layers/${{ inputs.layer }}/plan-output.txt
+          retention-days: 7
+      
+      - name: 📧 Send Drift Notification to Teams
+        if: steps.drift-check.outputs.drift_status == 'drift-detected'
+        working-directory: terraform/layers/${{ inputs.layer }}
+        run: |
+          # Count changes safely
+          ADD_COUNT=$(grep -c "will be created" plan-output.txt 2>/dev/null || true)
+          ADD_COUNT=${ADD_COUNT:-0}
+          
+          CHANGE_COUNT=$(grep -c "will be updated" plan-output.txt 2>/dev/null || true)
+          CHANGE_COUNT=${CHANGE_COUNT:-0}
+          
+          DESTROY_COUNT=$(grep -c "will be destroyed" plan-output.txt 2>/dev/null || true)
+          DESTROY_COUNT=${DESTROY_COUNT:-0}
+          
+          TOTAL_CHANGES=$((ADD_COUNT + CHANGE_COUNT + DESTROY_COUNT))
+          
+          # Build Teams message card
+          cat > teams-message.json << 'EOF'
+          {
+            "@type": "MessageCard",
+            "@context": "https://schema.org/extensions",
+            "themeColor": "FF6B35",
+            "summary": "Drift Detected: ${{ inputs.layer }}-${{ inputs.environment }}",
+            "sections": [
+              {
+                "activityTitle": "⚠️ Terraform Configuration Drift Detected",
+                "activitySubtitle": "Infrastructure changes detected outside of Terraform",
+                "activityImage": "https://www.terraform.io/assets/images/og-image-8b3e4f7d.png",
+                "facts": [
+                  {
+                    "name": "📁 Layer:",
+                    "value": "${{ inputs.layer }}"
+                  },
+                  {
+                    "name": "🌍 Environment:",
+                    "value": "${{ inputs.environment }}"
+                  },
+                  {
+                    "name": "📄 Config File:",
+                    "value": "${{ inputs.tfvars_file }}"
+                  },
+                  {
+                    "name": "📦 Repository:",
+                    "value": "${{ github.repository }}"
+                  },
+                  {
+                    "name": "🔀 Branch:",
+                    "value": "${{ github.ref_name }}"
+                  },
+                  {
+                    "name": "👤 Triggered By:",
+                    "value": "${{ github.actor }}"
+                  },
+                  {
+                    "name": "⏰ Detection Time:",
+                    "value": "REPLACE_TIMESTAMP"
+                  }
+                ],
+                "markdown": true
+              },
+              {
+                "title": "📊 Changes Summary",
+                "facts": [
+                  {
+                    "name": "➕ Resources to Create:",
+                    "value": "REPLACE_ADD_COUNT"
+                  },
+                  {
+                    "name": "🔄 Resources to Modify:",
+                    "value": "REPLACE_CHANGE_COUNT"
+                  },
+                  {
+                    "name": "❌ Resources to Delete:",
+                    "value": "REPLACE_DESTROY_COUNT"
+                  },
+                  {
+                    "name": "📈 Total Changes:",
+                    "value": "REPLACE_TOTAL_CHANGES"
+                  }
+                ]
+              },
+              {
+                "title": "� Recommended Actions",
+                "text": "1. 📥 Download drift plan artifact from workflow run\n\n2. 🔍 Review changes to understand the drift\n\n3. 🤔 Determine if drift is expected or requires action\n\n4. 📝 Document decision and actions taken"
+              }
+            ],
+            "potentialAction": [
+              {
+                "@type": "OpenUri",
+                "name": "View Workflow Run",
+                "targets": [
+                  {
+                    "os": "default",
+                    "uri": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                ]
+              },
+              {
+                "@type": "OpenUri",
+                "name": "View Repository",
+                "targets": [
+                  {
+                    "os": "default",
+                    "uri": "${{ github.server_url }}/${{ github.repository }}"
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
+          
+          # Replace placeholders with actual values
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          sed -i "s/REPLACE_ADD_COUNT/$ADD_COUNT/g" teams-message.json
+          sed -i "s/REPLACE_CHANGE_COUNT/$CHANGE_COUNT/g" teams-message.json
+          sed -i "s/REPLACE_DESTROY_COUNT/$DESTROY_COUNT/g" teams-message.json
+          sed -i "s/REPLACE_TOTAL_CHANGES/$TOTAL_CHANGES/g" teams-message.json
+          sed -i "s/REPLACE_TIMESTAMP/$TIMESTAMP/g" teams-message.json
+          
+          # Send to Teams
+          WEBHOOK_URL="${{ secrets.TEAMS_WEBHOOK_URL }}"
+          
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "⚠️ TEAMS_WEBHOOK_URL secret not configured, skipping Teams notification"
+            exit 0
+          fi
+          
+          curl -H "Content-Type: application/json" \
+               -d @teams-message.json \
+               "$WEBHOOK_URL"
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Teams notification sent successfully"
+          else
+            echo "❌ Failed to send Teams notification"
+            exit 1
+          fi
+        continue-on-error: true
+
+

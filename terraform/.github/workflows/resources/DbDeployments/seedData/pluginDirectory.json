@@ -1,0 +1,99 @@
+[
+  {
+    "id": "d575f792-aa58-47d9-8c0f-35bae9255934",
+    "name": "AgentDetailPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "bd0201e3-d4e0-4c80-9efa-d5d6ce3962d7",
+    "name": "DataTransformationPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "04b0408d-8320-41dd-9188-d46b05ccdbff",
+    "name": "PBCDataPointExtractPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "b7976c23-df40-4b72-8c5f-3aef3ca0397f",
+    "name": "DataPointMappingPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "df05f077-bffa-42cf-a66d-a367c0d54306",
+    "name": "HeaderMappingPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "51fa5028-0936-4f3d-8fbd-d2519ce1dc36",
+    "name": "DataValidationPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "ffd6e5cc-c557-4f03-b601-a661cf79cc0e",
+    "name": "TrialBalanceResultPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "7969d989-e772-4663-810b-fc8d84ff1221",
+    "name": "HeaderExtractionPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "29a60a73-cbe5-446b-8b1e-0e8b7ce77db6",
+    "name": "ChoiceListMappingPlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "name": "DataPointValidationPlugin",
+    "isGlobal": false,
+    "IsActive": true,
+    "id": "3cbf8c0a-1e6b-42f0-aa2a-23e94397091d"
+  },
+  {
+    "id": "95f05a7f-1d8c-45d8-abb6-4e7627f2d77d",
+    "name": "PdfToImagePlugin",
+    "isGlobal": false,
+    "IsActive": true
+  },
+  {
+    "id": "0b968dac-b5c5-4a76-9d53-d124dee781c1",
+    "name": "AttributeMappingPlugin",
+    "isGlobal": false,
+    "isActive": true
+  },
+  {
+    "id": "77d94cce-1d3d-4663-8f4c-2c4135b5a269",
+    "name": "TrialBalancePlugin",
+    "isGlobal": false,
+    "isActive": true
+  },
+  {
+    "id": "3d0d49a4-c907-4e82-95d7-3399316e4f25",
+    "name": "SupportDocumentPlugin",
+    "isGlobal": false,
+    "isActive": true
+  },
+  {
+    "id": "1d5f0700-88e6-44d9-9cf9-ae4909f47d79",
+    "name": "PartnerDataPlugin",
+    "isGlobal": false,
+    "isActive": true
+  },
+  {
+    "id": "162fc73e-bb57-40c3-9ebd-27f6a1a0c88e",
+    "name": "AdaptiveCodePlugin",
+    "isGlobal": false,
+    "isActive": true
+  }
+
+]

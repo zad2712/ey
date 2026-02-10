@@ -1,0 +1,97 @@
+name: Deploy admin
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        options:
+        - admin-qa
+        - admin-uat
+        - admin-prod
+  push:
+    paths:
+      - terraform/layers/admin/**
+    branches:
+      - main
+      - release_uat/*
+      - develop
+      - feature/*
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  plan-tf-backend-eyx-admin-qa:
+    name: plan-tf-backend-eyx-admin-qa
+    if: |
+      github.event.pull_request.base.ref == 'develop' ||
+      (
+        startsWith(github.event.ref, 'refs/heads/feature/') && 
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event.ref == 'refs/heads/develop' &&
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        inputs.environment == 'admin-qa'
+      )
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: admin-qa
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+      layer: admin
+      env_tfvars_folder: qa
+    secrets: inherit
+
+  plan-tf-backend-eyx-admin-uat:
+    name: plan-tf-backend-eyx-admin-uat
+    if: |
+      github.event.pull_request.base.ref == 'develop' ||
+      (
+        startsWith(github.event.ref, 'refs/heads/feature/') && 
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event.ref == 'refs/heads/develop' &&
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        inputs.environment == 'admin-uat'
+      )
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: admin-uat
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+      layer: admin
+      env_tfvars_folder: uat
+    secrets: inherit
+
+  plan-tf-backend-eyx-admin-prod:
+    name: plan-tf-backend-eyx-admin-prod
+    if: |
+      github.event.pull_request.base.ref == 'develop' ||
+      (
+        startsWith(github.event.ref, 'refs/heads/feature/') && 
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event.ref == 'refs/heads/develop' &&
+        github.event_name != 'workflow_dispatch'
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        inputs.environment == 'admin-prod'
+      )
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: admin-prod
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+      layer: admin
+      env_tfvars_folder: prod
+    secrets: inherit

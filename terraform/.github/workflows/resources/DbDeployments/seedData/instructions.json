@@ -1,0 +1,22 @@
+[
+  {
+    "ContainerName": "pluginDirectory",
+    "PartitionKey": "/id",
+    "Action": "insert"
+  },
+  {
+    "ContainerName": "apiAgents",
+    "PartitionKey": "/id",
+    "Action": "insert"
+  },
+  {
+    "ContainerName": "agentRoleBasedActions",
+    "PartitionKey": "/role",
+    "Action": "deleteAndLoad"
+  },
+  {
+    "ContainerName": "roleBasedPermissions",
+    "PartitionKey": "/role",
+    "Action": "deleteAndLoad"
+  }
+]

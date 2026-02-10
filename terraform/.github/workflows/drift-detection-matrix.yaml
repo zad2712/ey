@@ -1,0 +1,593 @@
+name: 🔍 Drift Detection Matrix
+
+on:
+  # Scheduled drift detection (daily at 6 AM UTC)
+  schedule:
+    - cron: '0 6 * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: 'Layer to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - app
+          - backend
+          - config
+          - core
+          - network
+        default: all
+      
+      environment:
+        description: 'Environment to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - dev1
+          - dev2
+          - dev3
+          - qa
+          - uat-lab
+          - uat-pilot
+          - uat-prod
+          - prod-lab
+          - prod-pilot
+          - prod
+        default: all
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  drift-detection:
+    name: 🔍 Drift ${{ matrix.layer }}-${{ matrix.environment }}
+    runs-on: ${{ fromJson(matrix.runs_on) }}
+    environment: ${{ matrix.environment }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # APP Layer - All Environments
+          - layer: app
+            environment: dev1
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev1.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: app
+            environment: dev2
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev2.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: app
+            environment: dev3
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev3.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: app
+            environment: qa
+            env_tfvars_folder: qa
+            tfvars_file: qa/qa.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+          - layer: app
+            environment: uat-lab
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-lab.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: app
+            environment: uat-pilot
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-pilot.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: app
+            environment: uat-prod
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-prod.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: app
+            environment: prod-lab
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-lab.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: app
+            environment: prod-pilot
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-pilot.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: app
+            environment: prod
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          
+          # BACKEND Layer - All Environments
+          - layer: backend
+            environment: dev1
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev1.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: backend
+            environment: dev2
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev2.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: backend
+            environment: dev3
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev3.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: backend
+            environment: qa
+            env_tfvars_folder: qa
+            tfvars_file: qa/qa.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+          - layer: backend
+            environment: uat-lab
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-lab.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: backend
+            environment: uat-pilot
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-pilot.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: backend
+            environment: uat-prod
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-prod.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: backend
+            environment: prod-lab
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-lab.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: backend
+            environment: prod-pilot
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-pilot.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: backend
+            environment: prod
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          
+          # CONFIG Layer - All Environments
+          - layer: config
+            environment: dev1
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev1.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: config
+            environment: dev2
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev2.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: config
+            environment: dev3
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev3.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: config
+            environment: qa
+            env_tfvars_folder: qa
+            tfvars_file: qa/qa.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+          - layer: config
+            environment: uat-lab
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-lab.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: config
+            environment: uat-pilot
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-pilot.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: config
+            environment: uat-prod
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-prod.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: config
+            environment: prod-lab
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-lab.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: config
+            environment: prod-pilot
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-pilot.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: config
+            environment: prod
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          
+          # CORE Layer - Dev, UAT, Prod (no QA)
+          - layer: core
+            environment: dev1
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev1.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: core
+            environment: dev2
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev2.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: core
+            environment: dev3
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev3.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: core
+            environment: uat-lab
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-lab.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: core
+            environment: uat-pilot
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-pilot.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: core
+            environment: uat-prod
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-prod.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: core
+            environment: prod-lab
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-lab.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: core
+            environment: prod-pilot
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-pilot.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: core
+            environment: prod
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          
+          # NETWORK Layer - All Environments
+          - layer: network
+            environment: dev1
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev1.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: network
+            environment: dev2
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev2.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: network
+            environment: dev3
+            env_tfvars_folder: dev
+            tfvars_file: dev/dev3.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx"}'
+          - layer: network
+            environment: qa
+            env_tfvars_folder: qa
+            tfvars_file: qa/qa.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+          - layer: network
+            environment: uat-lab
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-lab.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: network
+            environment: uat-pilot
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-pilot.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: network
+            environment: uat-prod
+            env_tfvars_folder: uat
+            tfvars_file: uat/uat-prod.tfvars
+            runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+          - layer: network
+            environment: prod-lab
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-lab.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: network
+            environment: prod-pilot
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod-pilot.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+          - layer: network
+            environment: prod
+            env_tfvars_folder: prod
+            tfvars_file: prod/prod.tfvars
+            runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    
+    steps:
+      # Step 0: Check if this combination should run
+      - name: Check if should run
+        id: should-run
+        run: |
+          SHOULD_RUN="false"
+          
+          # Always run on schedule
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            SHOULD_RUN="true"
+          fi
+          
+          # On manual trigger, check layer and environment filters
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            LAYER_MATCH="false"
+            ENV_MATCH="false"
+            
+            # Check layer filter
+            if [[ "${{ inputs.layer }}" == "all" ]] || [[ "${{ inputs.layer }}" == "${{ matrix.layer }}" ]]; then
+              LAYER_MATCH="true"
+            fi
+            
+            # Check environment filter
+            if [[ "${{ inputs.environment }}" == "all" ]] || [[ "${{ inputs.environment }}" == "${{ matrix.environment }}" ]]; then
+              ENV_MATCH="true"
+            fi
+            
+            # Both must match
+            if [[ "$LAYER_MATCH" == "true" ]] && [[ "$ENV_MATCH" == "true" ]]; then
+              SHOULD_RUN="true"
+            fi
+          fi
+          
+          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          
+          if [[ "$SHOULD_RUN" == "false" ]]; then
+            echo "⏭️ Skipping ${{ matrix.layer }}-${{ matrix.environment }} (filtered out)"
+          else
+            echo "✅ Running ${{ matrix.layer }}-${{ matrix.environment }}"
+          fi
+      
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        if: steps.should-run.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+
+      # Step 2: Login to Azure
+      - name: 'Login to Azure'
+        if: steps.should-run.outputs.should_run == 'true'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      # Step 3: Set up terraform
+      - name: Setup terraform
+        if: steps.should-run.outputs.should_run == 'true'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      # Step 4: replace vars
+      - name: Replace placeholders in provider.tf
+        if: steps.should-run.outputs.should_run == 'true'
+        run: |
+          cd ./terraform/layers/${{ matrix.layer }}
+          sed -i 's|${SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          sed -i 's|${RESOURCE_GROUP_NAME}|${{ vars.RESOURCE_GROUP_NAME }}|g' provider.tf
+          sed -i 's|${STORAGE_ACCOUNT_NAME}|${{ vars.STORAGE_ACCOUNT_NAME }}|g' provider.tf
+          sed -i 's|${TF_STATE_PATH}|${{ matrix.environment }}/|g' provider.tf
+          sed -i 's|${TENANT_ID}|${{ secrets.AZURE_TENANT_ID }}|g' provider.tf
+          
+          if [[ "${{ matrix.environment }}" == "dev1" || "${{ matrix.environment }}" == "dev2" || "${{ matrix.environment }}" == "dev3" ]]; then
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.BACKEND_SUBSCRIPTION_ID }}|g' provider.tf
+          else
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          fi
+
+      # Step 5: Terraform init
+      - name: Terraform init
+        if: steps.should-run.outputs.should_run == 'true'
+        run: |
+          cd ./terraform/layers/${{ matrix.layer }}
+          terraform init
+      
+      # Step 6: Terraform plan for drift detection
+      - name: Terraform plan for drift detection
+        if: steps.should-run.outputs.should_run == 'true'
+        working-directory: terraform/layers/${{ matrix.layer }}
+        id: drift-check
+        run: |
+          echo "🔍 Checking for configuration drift..."
+          echo "📁 Layer: ${{ matrix.layer }}"
+          echo "🌍 Environment: ${{ matrix.environment }}"
+          echo "📄 Tfvars file: ${{ matrix.tfvars_file }}"
+          
+          # Run plan to detect drift (capture exit code)
+          set +e
+          terraform plan \
+            -detailed-exitcode \
+            -out=drift-plan \
+            -var-file="environments/${{ matrix.tfvars_file }}" \
+            > plan-output.txt 2>&1
+          
+          PLAN_EXIT_CODE=$?
+          set -e
+          
+          # Exit codes: 0 = no changes, 1 = error, 2 = changes detected
+          case $PLAN_EXIT_CODE in
+            0)
+              echo "drift_status=no-drift" >> $GITHUB_OUTPUT
+              echo "✅ No drift detected"
+              exit 0
+              ;;
+            1)
+              echo "drift_status=error" >> $GITHUB_OUTPUT
+              echo "❌ Error during drift detection"
+              cat plan-output.txt
+              exit 1
+              ;;
+            2)
+              echo "drift_status=drift-detected" >> $GITHUB_OUTPUT
+              echo "⚠️ Configuration drift detected!"
+              
+              # Count changes
+              CHANGES=$(grep -E "Plan:|# " plan-output.txt | head -10 || echo "No change summary found")
+              echo "Changes summary:"
+              echo "$CHANGES"
+              exit 0
+              ;;
+          esac
+      
+      - name: 📊 Parse Drift Details
+        working-directory: terraform/layers/${{ matrix.layer }}
+        if: steps.should-run.outputs.should_run == 'true' && steps.drift-check.outputs.drift_status == 'drift-detected'
+        run: |
+          echo "📊 Analyzing drift details..."
+          
+          # Extract change summary
+          ADD_COUNT=$(grep -c "will be created" plan-output.txt 2>/dev/null || true)
+          CHANGE_COUNT=$(grep -c "will be updated" plan-output.txt 2>/dev/null || true)
+          DESTROY_COUNT=$(grep -c "will be destroyed" plan-output.txt 2>/dev/null || true)
+          
+          # Ensure counts are set (default to 0 if empty)
+          ADD_COUNT=${ADD_COUNT:-0}
+          CHANGE_COUNT=${CHANGE_COUNT:-0}
+          DESTROY_COUNT=${DESTROY_COUNT:-0}
+          
+          # Build the report
+          echo "# ⚠️ Configuration Drift Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Environment and Layer Info
+          echo "### 📋 Detection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Layer** | \`${{ matrix.layer }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | \`${{ matrix.environment }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Config File** | \`${{ matrix.tfvars_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Detection Time** | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Changes Overview
+          echo "### 📊 Changes Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Change Type | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Create | $ADD_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Modify | $CHANGE_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Resources to Delete | $DESTROY_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract and show affected resources
+          echo "### 🎯 Affected Resources" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Resources to be created
+          if [ "$ADD_COUNT" -gt 0 ]; then
+            echo "#### ➕ Resources to Create ($ADD_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be created" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Resources to be modified
+          if [ "$CHANGE_COUNT" -gt 0 ]; then
+            echo "#### 🔄 Resources to Modify ($CHANGE_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be updated" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Resources to be destroyed
+          if [ "$DESTROY_COUNT" -gt 0 ]; then
+            echo "#### ❌ Resources to Delete ($DESTROY_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "will be destroyed" plan-output.txt | sed 's/^[[:space:]]*//' | head -20 >> $GITHUB_STEP_SUMMARY || echo "No details available" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Action items
+          echo "### 🔧 Recommended Actions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. 📥 Download the drift plan artifact from this workflow run" >> $GITHUB_STEP_SUMMARY
+          echo "2. 🔍 Review the changes carefully to understand the drift" >> $GITHUB_STEP_SUMMARY
+          echo "3. 🤔 Determine if drift is expected or requires action:" >> $GITHUB_STEP_SUMMARY
+          echo "   - **Expected:** Update Terraform code to match infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "   - **Unexpected:** Apply Terraform to restore desired state" >> $GITHUB_STEP_SUMMARY
+          echo "4. 📝 Document the decision and actions taken" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Plan summary extract
+          echo "### 📄 Terraform Plan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to expand full plan output (first 100 lines)</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`terraform" >> $GITHUB_STEP_SUMMARY
+          head -100 plan-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 **Tip:** Full plan details are available in the uploaded artifacts" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 📊 No Drift Summary
+        if: steps.should-run.outputs.should_run == 'true' && steps.drift-check.outputs.drift_status == 'no-drift'
+        run: |
+          echo "# ✅ No Configuration Drift Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📋 Detection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Layer** | \`${{ matrix.layer }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | \`${{ matrix.environment }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Config File** | \`${{ matrix.tfvars_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Detection Time** | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ✅ **No Changes Required** |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🎉 Infrastructure State" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployed infrastructure **perfectly matches** the Terraform configuration." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ No manual changes detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ No configuration drift" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✨ All resources are in the desired state" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💚 **Great job!** Your infrastructure is properly managed and in sync." >> $GITHUB_STEP_SUMMARY
+      
+      - name: 💾 Upload Drift Plan
+        uses: actions/upload-artifact@v4
+        if: steps.should-run.outputs.should_run == 'true' && steps.drift-check.outputs.drift_status == 'drift-detected'
+        with:
+          name: drift-plan-${{ matrix.layer }}-${{ matrix.environment }}
+          path: terraform/layers/${{ matrix.layer }}/drift-plan
+          retention-days: 30
+      
+      - name: 📄 Upload Plan Output
+        uses: actions/upload-artifact@v4
+        if: steps.should-run.outputs.should_run == 'true'
+        with:
+          name: plan-output-${{ matrix.layer }}-${{ matrix.environment }}
+          path: terraform/layers/${{ matrix.layer }}/plan-output.txt
+          retention-days: 7

@@ -1,0 +1,144 @@
+name: Deploy config
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        options:
+        - dev1
+        - dev2
+        - dev3
+        - qa
+        - uat-lab
+        - uat-pilot
+        - uat-prod
+        - prod-lab
+        - prod-pilot
+        - prod
+
+  push:
+    paths:
+      - terraform/layers/config/**
+    branches:
+      - main
+      - release_uat/*
+      - release_qa/*
+      - develop
+      - feature/*
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  plan-tf-config-eyx-dev1:
+    name: plan-tf-config-eyx-dev1
+    if: github.event_name == 'workflow_dispatch' && inputs.environment == 'dev1'
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: dev1
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+      layer: config
+      env_tfvars_folder: dev
+    secrets: inherit
+
+  plan-tf-config-eyx-dev2:
+    name: plan-tf-config-eyx-dev2
+    if: github.event_name == 'workflow_dispatch' && inputs.environment == 'dev2'
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: dev2
+      layer: config
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+      env_tfvars_folder: dev
+    secrets: inherit
+
+  plan-tf-config-eyx-dev3:
+    name: plan-tf-config-eyx-dev3
+    if: github.event_name == 'workflow_dispatch' && inputs.environment == 'dev3'
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: dev3
+      layer: config
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+      env_tfvars_folder: dev
+    secrets: inherit
+
+  plan-tf-config-eyx-qa:
+    name: plan-tf-config-eyx-qa
+    if: startsWith(github.event.pull_request.base.ref, 'release_qa/') || startsWith(github.event.ref, 'refs/heads/release_qa/') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: qa
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+      layer: config
+      env_tfvars_folder: qa
+    secrets: inherit
+
+  plan-tf-config-eyx-uat-lab:
+    name: plan-tf-config-eyx-uat-lab
+    if: startsWith(github.event.pull_request.base.ref, 'release_uat/') || startsWith(github.event.ref, 'refs/heads/release_uat/') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-lab')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: uat-lab
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+      layer: config
+      env_tfvars_folder: uat
+    secrets: inherit
+
+  plan-tf-config-eyx-uat-pilot:
+    name: plan-tf-config-eyx-uat-pilot
+    if: startsWith(github.event.pull_request.base.ref, 'release_uat/') || startsWith(github.event.ref, 'refs/heads/release_uat/') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-pilot')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: uat-pilot
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+      layer: config
+      env_tfvars_folder: uat
+    secrets: inherit
+
+  plan-tf-config-eyx-uat-prod:
+    name: plan-tf-config-eyx-uat-prod
+    if: startsWith(github.event.pull_request.base.ref, 'release_uat/') || startsWith(github.event.ref, 'refs/heads/release_uat/') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'uat-prod')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: uat-prod
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+      layer: config
+      env_tfvars_folder: uat
+    secrets: inherit
+
+  plan-tf-config-eyx-prod-lab:
+    name: plan-tf-config-eyx-prod-lab
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod-lab')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: prod-lab
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+      layer: config
+      env_tfvars_folder: prod
+    secrets: inherit
+
+  plan-tf-config-eyx-prod-pilot:
+    name: plan-tf-config-eyx-prod-pilot
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod-pilot')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: prod-pilot
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+      layer: config
+      env_tfvars_folder: prod
+    secrets: inherit
+
+  plan-tf-config-eyx-prod:
+    name: plan-tf-config-eyx-prod
+    if: github.event.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod')
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      environment: prod
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+      layer: config
+      env_tfvars_folder: prod
+    secrets: inherit

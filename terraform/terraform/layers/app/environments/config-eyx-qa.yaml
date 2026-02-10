@@ -1,0 +1,351 @@
+##############
+#   eyx-qa   #
+##############
+# This file should be used as a reference for the Application Layer configuration for the EYX QA environment.
+# It contains the configuration details for Azure Resources included in the Application Layer.
+# It's pseudo-code only and should not be used as a real configuration file. 
+# The actual configuration should be done in the Terraform files located in the `il-eyx-iac/terraform/layers/app/environments` directory.
+global:
+  tags:
+    ENVIRONMENT: "QA"
+    DEPLOYMENT_ID: "CXS05H"
+    ENGAGEMENT_ID: "I-68933458"
+    CTP_SERVICE: "Co-Dev"
+    OWNER: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+    PRODUCT_APP: "EYX - Agent Framework"
+    TF_LAYER: "App"
+  location: "eastus"
+  diagnostics:
+    enabled: true
+    logs:
+      AllMetrics: true
+      log_analytics: true
+      workspace_id: "qa log workspace id"
+  managed_identity:
+    type: "SystemAssigned"
+###############################################################################################################
+###############################################################################################################
+app_service_plan:
+  ui:
+    tags:
+      hidden-title: "EYX - UI App Service Plan - QA"
+      ROLE_PURPOSE: "App Service Plan - UI"
+    # Frontend Infrastructure could be transfered to EYQ's Frontend
+    # This might need to be decommissioned in the future
+    sku: "P1v3"
+    os: "Windows"
+    ui_app_service:
+      tags:
+        hidden-title: "EYX - UI App Service - QA"
+        ROLE_PURPOSE: "App Service - UI"
+      app_settings:
+        env_variables:
+          - APPINSIGHTS_INSTRUMENTATIONKEY: "qa app insights instrumentation key"
+          - APPLICATIONINSIGHTS_CONNECTION_STRING: "qa app insights connection string"
+        configuration:
+          general_settings:
+            - runtime_stack: "DOTNETCORE|6.0"
+            - runtime_version: "~6"
+            - platform: "64BIT"
+            - managed_pipeline_mode: "Integrated"
+            - scm_basic_auth_enabled: true
+            - ftp_basic_auth_enabled: true
+            - ftp_state: "Disabled"
+            - Inbound_ip_mode: "IPv4"
+            - http_version: "1.1"
+            - HTTP_2.0: "Off"
+            - web_sockets: "Off"
+            - always_on: "Off"
+            - session_affinity: "Off"
+            - session_affinity_proxy: "Off"
+            - min_tls_version: "1.2"
+            - https_only: true
+            - end_to_end_encryption: "Off"
+          default_documents:
+            - "index.html"
+            - "hostingstart.html"
+      app_insights:
+        enabled: "true"
+        app_insights_name: "USEQCXS05HAAI01"
+      identity:
+        type: "SystemAssigned"
+      certificate:
+        byot: 
+          - domain: "eyx-qa-use.ey.com"
+          - cert_name: "USEQCXS05HAKV02-eyx-qa-use.ey.com"
+      custom_domain:
+        domain_name: "eyx-qa-use.ey.com"
+        certificate: "USEQCXS05HAKV02-eyx-qa-use.ey.com"
+      network:
+        vnet_integration:
+          vnet_name: "vnet_frontend"
+          subnet_name: "subnet_vnetintegration"
+        inbound_services:
+          - AzureFrontDoor
+  api:
+    tags:
+      hidden-title: "EYX - API App Service Plan - QA"
+      ROLE_PURPOSE: "App Service Plan - API"
+    sku: "P1v3"
+    os: "Windows"
+    app_services:
+      webapi_app_service:
+        tags:
+          hidden-title: "EYX - WebAPI App Service - QA"
+          ROLE_PURPOSE: "App Service - WebAPI"
+        app_settings:
+          env_variables:
+            - KeyVaultUrl: "qa app azure key vault url"
+            - ASPNETCORE_ENVIRONMENT: "QA"
+            - APPINSIGHTS_INSTRUMENTATIONKEY: "qa app insights instrumentation key"
+          configuration:
+            general_settings:
+              - runtime_stack: "DOTNETCORE|6.0"
+              - runtime_version: "~6"
+              - platform: "64BIT"
+              - managed_pipeline_mode: "Integrated"
+              - scm_basic_auth_enabled: true
+              - ftp_basic_auth_enabled: true
+              - ftp_state: "Disabled"
+              - Inbound_ip_mode: "IPv4"
+              - http_version: "1.1"
+              - HTTP_2.0: "Off"
+              - web_sockets: "On"
+              - always_on: "Off"
+              - session_affinity: "Off"
+              - session_affinity_proxy: "Off"
+              - min_tls_version: "1.2"
+              - https_only: true
+              - end_to_end_encryption: "Off"
+            default_documents:
+              - "index.html"
+        app_insights:
+          enabled: "true"
+          app_insights_name: "USEQCXS05HAAI01"
+        identity:
+          type: "SystemAssigned"
+        CORS:
+          enable: true
+          allowed_origins:
+            - "https://apim.eyx-qa-use.ey.com"
+        network:
+          vnet_integration:
+            vnet_name: "vnet_frontend"
+            subnet_name: "subnet_privateendpoints"
+          inbound_traffic_configuration:
+            public_network_access: "Disabled"
+            private_endpoints:
+              - name: "USEDCXS05HPEP02"
+                subnet_name: "subnet_privateendpoints"
+                private_dns_zone: "privatelink.azurewebsites.net"
+      noticeapi_app_service:
+        tags:
+          hidden-title: "EYX - Notice API App Service - QA"
+          ROLE_PURPOSE: "App Service - Notice API"
+        app_settings:
+          env_variables:
+            - KeyVaultUrl: "qa app azure key vault url"
+            - ASPNETCORE_ENVIRONMENT: "QA"
+            - APPINSIGHTS_INSTRUMENTATIONKEY: "qa app insights instrumentation key"
+          configuration:
+            general_settings:
+              - runtime_stack: "DOTNETCORE|6.0"
+              - runtime_version: "~6"
+              - platform: "64BIT"
+              - managed_pipeline_mode: "Integrated"
+              - scm_basic_auth_enabled: true
+              - ftp_basic_auth_enabled: true
+              - ftp_state: "Disabled"
+              - Inbound_ip_mode: "IPv4"
+              - http_version: "1.1"
+              - HTTP_2.0: "Off"
+              - web_sockets: "Off"
+              - always_on: "On"
+              - session_affinity: "On"
+              - session_affinity_proxy: "Off"
+              - min_tls_version: "1.2"
+              - https_only: true
+              - end_to_end_encryption: "Off"
+            default_documents:
+              - "index.html"
+        app_insights:
+          enabled: "true"
+          app_insights_name: "USEQCXS05HAAI01"
+        identity:
+          type: "SystemAssigned"
+        CORS:
+          enable: true
+          allowed_origins:
+            - "https://apim.eyx-qa-use.ey.com"
+        network:
+          vnet_integration:
+            vnet_name: "vnet_frontend"
+            subnet_name: "subnet_privateendpoints"
+          inbound_traffic_configuration:
+            public_network_access: "Disabled"
+            private_endpoints:
+              - name: "USEDCXS05HPEP02"
+                subnet_name: "subnet_privateendpoints"
+                private_dns_zone: "privatelink.azurewebsites.net"
+      kernelapi_app_service:
+      tags:
+        hidden-title: "EYX - Kernel API App Service - QA"
+        ROLE_PURPOSE: "App Service - Kernel API"
+      app_settings:
+        env_variables:
+          - KeyVaultUrl: "qa app azure key vault url"
+          - ASPNETCORE_ENVIRONMENT: "QA"
+          - APPINSIGHTS_INSTRUMENTATIONKEY: "qa app insights instrumentation key"
+        configuration:
+          general_settings:
+            - runtime_stack: "DOTNETCORE|6.0"
+            - runtime_version: "~6"
+            - platform: "64BIT"
+            - managed_pipeline_mode: "Integrated"
+            - scm_basic_auth_enabled: true
+            - ftp_basic_auth_enabled: true
+            - ftp_state: "Disabled"
+            - Inbound_ip_mode: "IPv4"
+            - http_version: "1.1"
+            - HTTP_2.0: "Off"
+            - web_sockets: "Off"
+            - always_on: "On"
+            - session_affinity: "On"
+            - session_affinity_proxy: "Off"
+            - min_tls_version: "1.2"
+            - https_only: true
+            - end_to_end_encryption: "Off"
+          default_documents:
+            - "index.html"
+      app_insights:
+        enabled: "true"
+        app_insights_name: "USEQCXS05HAAI01"
+      identity:
+        type: "SystemAssigned"
+      CORS:
+        enable: true
+        allowed_origins:
+          - "https://apim.eyx-qa-use.ey.com"
+      network:
+        vnet_integration:
+          vnet_name: "vnet_frontend"
+          subnet_name: "subnet_privateendpoints"
+        inbound_traffic_configuration:
+          public_network_access: "Disabled"
+          private_endpoints:
+            - name: "USEDCXS05HPEP02"
+              subnet_name: "subnet_privateendpoints"
+              private_dns_zone: "privatelink.azurewebsites.net"
+  function_app:
+    tags:
+      hidden-title: "EYX - Function App Service Plan - QA"
+      ROLE_PURPOSE: "App Service Plan - Function App"
+    sku: "P1v3"
+    os: "Windows"
+    app_services:
+      function_app:
+      tags:
+        hidden-title: "EYX - Function App Service - QA"
+        ROLE_PURPOSE: "App Service - Function App"
+      app_settings:
+        env_variables:
+          # Should we configure these in Terraform or in the GitHub Actions?
+        configuration:
+          function_runtime_settings:
+            - runtime_version: "~4"
+          general_settings:
+            - runtime_stack: "DOTNETCORE|6.0"
+            - platform: "32BIT"
+            - managed_pipeline_mode: "Integrated"
+            - scm_basic_auth_enabled: true
+            - ftp_basic_auth_enabled: true
+            - ftp_state: "Disabled"
+            - Inbound_ip_mode: "IPv4"
+            - http_version: "1.1"
+            - HTTP_2.0: "Off"
+            - web_sockets: "Off"
+            - always_on: "On"
+            - session_affinity: "On"
+            - session_affinity_proxy: "Off"
+            - min_tls_version: "1.2"
+            - https_only: true
+            - end_to_end_encryption: "Off"
+          default_documents:
+            - "index.html"
+      app_insights:
+        enabled: "true"
+        app_insights_name: "USEQCXS05HAAI01"
+      identity:
+        type: "SystemAssigned"
+      CORS:
+        enable: true
+        allowed_origins:
+          - "https://apim.eyx-qa-use.ey.com"
+      network:
+        vnet_integration:
+          vnet_name: "vnet_frontend"
+          subnet_name: "subnet_privateendpoints"
+        inbound_traffic_configuration:
+          public_network_access: "Disabled"
+          private_endpoints:
+            - name: "USEDCXS05HPEP02"
+              subnet_name: "subnet_privateendpoints"
+              private_dns_zone: "privatelink.azurewebsites.net"
+###############################################################################################################
+###############################################################################################################
+signalr:
+  tags:
+    hidden-title: "EYX - SignalR Service - QA"
+    ROLE_PURPOSE: "SignalR Service"
+  sku: "Standard_S1"
+  identity:
+    type: "SystemAssigned"
+  networking:
+    public_network_access: "Enabled"
+    default_action: "Deny"
+    request_type_rules:
+      - allow: 
+          - "Select All"
+    ip_rules:
+      - service_tag: "AzureFrontDoor.Backend"
+      - service_tag: "AppService"
+    private_endpoints:
+      - name: "tbd"
+        vnet_name: "vnet_frontend"
+        subnet_name: "subnet_privateendpoints"
+        private_dns_zone: "privatelink.signalr.azure.com"
+###############################################################################################################
+###############################################################################################################
+openai:
+  tags:
+    hidden-title: "EYX - OpenAI Service - QA"
+    ROLE_PURPOSE: "OpenAI Service"
+  sku: "Standard"
+  identity:
+    type: "SystemAssigned"
+  networking:
+    public_network_access: "Selected Networks and Private Endpoints"
+    virtual_networks:
+      - vnet_name: "vnet_frontend"
+        subnet_name: "subnet_privateendpoints"
+        subnet_name: "subnet_vnetintegration"
+        subnet_name: "subnet_apim"
+      - vnet_name: "vnet_backend"
+        subnet_name: "subnet_privateendpoints"
+        subnet_name: "subnet_aca"
+    private_endpoints:
+      - name: "USEDCXS05HPEPxx" #TBD DEFINED 
+        vnet_name: "vnet_frontend"
+        subnet_name: "subnet_privateendpoints"
+        private_dns_zone: "privatelink.openai.azure.com"
+###############################################################################################################
+###############################################################################################################
+docint:
+###############################################################################################################
+###############################################################################################################
+speech:
+###############################################################################################################
+###############################################################################################################
+sta:
+aca:
+acr:

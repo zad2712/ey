@@ -1,0 +1,310 @@
+[
+  {
+    "id": "d8b996bd-906f-4f78-b55f-89b0ba2c2f16",
+    "role": "Admin",
+    "permissions": [
+      {
+        "permissionType": "User",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "User",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "User",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Share"
+      },
+      {
+        "permissionType": "MetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "ChatSetting",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Notice",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "NoticeMetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "RBAC",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Knowledge",
+        "permissionValue": ""
+      }
+    ]
+  },
+  {
+    "id": "fe67089a-388e-4589-8a3f-568629320cae",
+    "role": "Editor",
+    "permissions": [
+      {
+        "permissionType": "User",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Knowledge",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Share"
+      },
+      {
+        "permissionType": "MetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "ChatSetting",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Notice",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "NoticeMetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "RBAC",
+        "permissionValue": ""
+      }
+    ]
+  },
+  {
+    "id": "2a323245-5098-472c-9be3-d81db1852f0b",
+    "role": "Author",
+    "permissions": [
+      {
+        "permissionType": "User",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Share"
+      },
+      {
+        "permissionType": "MetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "ChatSetting",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Notice",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "NoticeMetaPrompt",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "RBAC",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "Knowledge",
+        "permissionValue": ""
+      }
+    ]
+  },
+  {
+    "id": "14b4c0a2-fa05-4c6e-9975-bfde0dfa1214",
+    "role": "Team Author",
+    "permissions": [
+      {
+        "permissionType": "User",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "User",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "User",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "Knowledge",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Read"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "MetaPrompt",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "ChatSetting",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "Notice",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "NoticeMetaPrompt",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "RBAC",
+        "permissionValue": ""
+      }
+    ]
+  },
+  {
+    "id": "g4f696bd-906f-4f78-08G5-89b0ba2c2f16",
+    "role": "Consumer",
+    "permissions": [
+      {
+        "permissionType": "User",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "Knowledge",
+        "permissionValue": "Used"
+      },
+      {
+        "permissionType": "Agent",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Share"
+      },
+      {
+        "permissionType": "Chat",
+        "permissionValue": "Delete"
+      },
+      {
+        "permissionType": "MetaPrompt",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "ChatSetting",
+        "permissionValue": "Write"
+      },
+      {
+        "permissionType": "Notice",
+        "permissionValue": "Initiate"
+      },
+      {
+        "permissionType": "NoticeMetaPrompt",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "FoundationalSkills",
+        "permissionValue": ""
+      },
+      {
+        "permissionType": "RBAC",
+        "permissionValue": ""
+      }
+    ]
+  },
+  {
+    "id": "d380f656-82ed-4a4b-9b89-42760b31741a",
+    "role": "Tester",
+    "permissions": [
+      {
+        "permissionType": "Agent",
+        "permissionValue": "Read"
+      },
+      {
+            "permissionType": "Chat",
+            "permissionValue": "Initiate"
+      }
+    ]
+  }
+]

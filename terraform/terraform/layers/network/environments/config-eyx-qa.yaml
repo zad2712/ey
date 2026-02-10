@@ -1,0 +1,73 @@
+##############
+#   eyx-qa   #
+##############
+# This file should be used as a reference for the Network Layer configuration for the EYX QA environment.
+# It contains the configuration details for Azure Resources included in the Network Layer.
+# It's pseudo-code only and should not be used as a real configuration file. 
+# The actual configuration should be done in the Terraform files located in the `il-eyx-iac/terraform/layers/network/environments` directory.
+global:
+  tags:
+    ENVIRONMENT: "QA"
+    DEPLOYMENT_ID: "CXS05H"
+    ENGAGEMENT_ID: "I-68933458"
+    CTP_SERVICE: "Co-Dev"
+    OWNER: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+    PRODUCT_APP: "EYX - Agent Framework"
+    TF_LAYER: "Network"
+  location: "eastus"
+vnets:
+  tags:
+    PEER: "Codev"
+    ROLE_PURPOSE: "Virtual Network"
+    HUBTRANSITIVEROUTING: "false"
+  vnet_admin:
+    size: "/27"
+    tags:
+      hidden-title: "EYX - Admin"
+      IPAM_ORGANIZATION: "CTILEYXIPAM"
+      IPAM_IPRANGE_NAME: ""
+    subnets:
+      global:
+        serviceEndpoints:
+          "all"
+        enforce_nsg:
+          "enabled"
+      subnet_admin:
+        size: "/27"
+  vnet_frontend:
+    size: "/25"
+    tags:
+      hidden-title: "EYX - Frontend"
+      IPAM_ORGANIZATION: "CTILEYXIPAM"
+      IPAM_IPRANGE_NAME: ""
+    subnets:
+      global:
+        serviceEndpoints:
+          "all"
+        enforce_nsg:
+          "enabled"
+      subnet_pep:
+        size: "/28"
+      subnet_vnetintegration:
+        size: "/27"
+      subnet_apim:
+        size: "/26"
+  vnet_backend:
+    size: "/25"
+    tags:
+      hidden-title: "EYX - Backend"
+      IPAM_ORGANIZATION: "CTILEYXIPAM"
+      IPAM_IPRANGE_NAME: ""
+    subnets:
+      global:
+        serviceEndpoints:
+          "all"
+        enforce_nsg:
+          "enabled"
+      subnet_pep:
+        size: "/27"
+      subnet_openai:
+        size: "/27"
+      subnet_aca:
+        size: "/26"
+nsgs:

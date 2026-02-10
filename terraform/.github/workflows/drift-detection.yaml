@@ -1,0 +1,752 @@
+name: 🔍 Drift Detection
+
+on:
+  # Scheduled drift detection (daily at 6 AM UTC)
+  schedule:
+    - cron: '0 6 * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: 'Layer to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - app
+          - backend
+          - config
+          - core
+          - network
+        default: all
+      
+      environment:
+        description: 'Environment to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - dev1
+          - dev2
+          - dev3
+          - qa
+          - uat-lab
+          - uat-pilot
+          - uat-prod
+          - prod-lab
+          - prod-pilot
+          - prod
+        default: all
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  #=============================================================================
+  # APP Layer - All Environments
+  #=============================================================================
+  
+  drift-app-dev1:
+    name: Drift App Dev1
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'dev1'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev1
+      layer: app
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev1.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-app-dev2:
+    name: Drift App Dev2
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'dev2'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev2
+      layer: app
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev2.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-app-dev3:
+    name: Drift App Dev3
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'dev3'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev3
+      layer: app
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev3.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-app-qa:
+    name: Drift App QA
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'qa'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: qa
+      layer: app
+      env_tfvars_folder: qa
+      tfvars_file: qa/qa.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+    secrets: inherit
+
+  drift-app-uat-lab:
+    name: Drift App UAT Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'uat-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-lab
+      layer: app
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-lab.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-app-uat-pilot:
+    name: Drift App UAT Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'uat-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-pilot
+      layer: app
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-pilot.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-app-uat-prod:
+    name: Drift App UAT Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'uat-prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-prod
+      layer: app
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-prod.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-app-prod-lab:
+    name: Drift App Prod Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'prod-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-lab
+      layer: app
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-lab.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-app-prod-pilot:
+    name: Drift App Prod Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'prod-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-pilot
+      layer: app
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-pilot.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-app-prod:
+    name: Drift App Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'app') && (inputs.environment == 'all' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod
+      layer: app
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  #=============================================================================
+  # BACKEND Layer - All Environments
+  #=============================================================================
+  
+  drift-backend-dev1:
+    name: Drift Backend Dev1
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'dev1'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev1
+      layer: backend
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev1.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-backend-dev2:
+    name: Drift Backend Dev2
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'dev2'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev2
+      layer: backend
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev2.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-backend-dev3:
+    name: Drift Backend Dev3
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'dev3'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev3
+      layer: backend
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev3.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-backend-qa:
+    name: Drift Backend QA
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'qa'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: qa
+      layer: backend
+      env_tfvars_folder: qa
+      tfvars_file: qa/qa.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+    secrets: inherit
+
+  drift-backend-uat-lab:
+    name: Drift Backend UAT Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'uat-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-lab
+      layer: backend
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-lab.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-backend-uat-pilot:
+    name: Drift Backend UAT Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'uat-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-pilot
+      layer: backend
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-pilot.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-backend-uat-prod:
+    name: Drift Backend UAT Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'uat-prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-prod
+      layer: backend
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-prod.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-backend-prod-lab:
+    name: Drift Backend Prod Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'prod-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-lab
+      layer: backend
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-lab.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-backend-prod-pilot:
+    name: Drift Backend Prod Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'prod-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-pilot
+      layer: backend
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-pilot.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-backend-prod:
+    name: Drift Backend Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'backend') && (inputs.environment == 'all' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod
+      layer: backend
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  #=============================================================================
+  # CONFIG Layer - All Environments
+  #=============================================================================
+  
+  drift-config-dev1:
+    name: Drift Config Dev1
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'dev1'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev1
+      layer: config
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev1.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-config-dev2:
+    name: Drift Config Dev2
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'dev2'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev2
+      layer: config
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev2.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-config-dev3:
+    name: Drift Config Dev3
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'dev3'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev3
+      layer: config
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev3.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-config-qa:
+    name: Drift Config QA
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'qa'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: qa
+      layer: config
+      env_tfvars_folder: qa
+      tfvars_file: qa/qa.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+    secrets: inherit
+
+  drift-config-uat-lab:
+    name: Drift Config UAT Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'uat-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-lab
+      layer: config
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-lab.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-config-uat-pilot:
+    name: Drift Config UAT Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'uat-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-pilot
+      layer: config
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-pilot.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-config-uat-prod:
+    name: Drift Config UAT Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'uat-prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-prod
+      layer: config
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-prod.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-config-prod-lab:
+    name: Drift Config Prod Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'prod-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-lab
+      layer: config
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-lab.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-config-prod-pilot:
+    name: Drift Config Prod Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'prod-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-pilot
+      layer: config
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-pilot.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-config-prod:
+    name: Drift Config Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'config') && (inputs.environment == 'all' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod
+      layer: config
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  #=============================================================================
+  # CORE Layer - Dev, UAT, Prod (no QA)
+  #=============================================================================
+  
+  drift-core-dev1:
+    name: Drift Core Dev1
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'dev1'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev1
+      layer: core
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev1.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-core-dev2:
+    name: Drift Core Dev2
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'dev2'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev2
+      layer: core
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev2.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-core-dev3:
+    name: Drift Core Dev3
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'dev3'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev3
+      layer: core
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev3.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-core-uat-lab:
+    name: Drift Core UAT Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'uat-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-lab
+      layer: core
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-lab.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-core-uat-pilot:
+    name: Drift Core UAT Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'uat-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-pilot
+      layer: core
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-pilot.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-core-uat-prod:
+    name: Drift Core UAT Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'uat-prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-prod
+      layer: core
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-prod.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-core-prod-lab:
+    name: Drift Core Prod Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'prod-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-lab
+      layer: core
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-lab.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-core-prod-pilot:
+    name: Drift Core Prod Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'prod-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-pilot
+      layer: core
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-pilot.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-core-prod:
+    name: Drift Core Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'core') && (inputs.environment == 'all' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod
+      layer: core
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  #=============================================================================
+  # NETWORK Layer - All Environments
+  #=============================================================================
+  
+  drift-network-dev1:
+    name: Drift Network Dev1
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'dev1'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev1
+      layer: network
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev1.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-network-dev2:
+    name: Drift Network Dev2
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'dev2'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev2
+      layer: network
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev2.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-network-dev3:
+    name: Drift Network Dev3
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'dev3'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: dev3
+      layer: network
+      env_tfvars_folder: dev
+      tfvars_file: dev/dev3.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx"}'
+    secrets: inherit
+
+  drift-network-qa:
+    name: Drift Network QA
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'qa'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: qa
+      layer: network
+      env_tfvars_folder: qa
+      tfvars_file: qa/qa.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-qa"}'
+    secrets: inherit
+
+  drift-network-uat-lab:
+    name: Drift Network UAT Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'uat-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-lab
+      layer: network
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-lab.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-network-uat-pilot:
+    name: Drift Network UAT Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'uat-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-pilot
+      layer: network
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-pilot.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-network-uat-prod:
+    name: Drift Network UAT Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'uat-prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: uat-prod
+      layer: network
+      env_tfvars_folder: uat
+      tfvars_file: uat/uat-prod.tfvars
+      runs_on: '{"group": "large-runner-grp-eyx-uat"}'
+    secrets: inherit
+
+  drift-network-prod-lab:
+    name: Drift Network Prod Lab
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'prod-lab'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-lab
+      layer: network
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-lab.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-network-prod-pilot:
+    name: Drift Network Prod Pilot
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'prod-pilot'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod-pilot
+      layer: network
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod-pilot.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit
+
+  drift-network-prod:
+    name: Drift Network Prod
+    if: |
+      (github.event_name == 'schedule') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.layer == 'all' || inputs.layer == 'network') && (inputs.environment == 'all' || inputs.environment == 'prod'))
+    uses: ./.github/workflows/drift-detection-reusable.yml
+    with:
+      environment: prod
+      layer: network
+      env_tfvars_folder: prod
+      tfvars_file: prod/prod.tfvars
+      runs_on: '{"group": "large-runner-vnet-eyx-prod"}'
+    secrets: inherit

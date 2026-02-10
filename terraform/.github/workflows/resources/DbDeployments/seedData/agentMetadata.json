@@ -1,0 +1,79 @@
+[
+  {
+    "id": "fe040035-62b7-4fed-831c-714a15e2dbda",
+    "agentActions": [],
+    "states": [
+      "Draft",
+      "Piloting",
+      "Pending Publication",
+      "Published",
+      "Pending Suspension",
+      "Suspended",
+      "Pending Activation",
+      "Active",
+      "Pending Removal",
+      "Withdrawn",
+      "Archived"
+    ],
+    "steps": [
+      {
+        "environment": "Lab",
+        "steps": [
+          {
+            "name": "Sandbox",
+            "isDefault": true
+          },
+          {
+            "name": "POC Approved",
+            "isDefault": false
+          },
+          {
+            "name": "Pending Plugin",
+            "isDefault": false
+          },
+          {
+            "name": "Refinement & Q/A Test",
+            "isDefault": false
+          },
+          {
+            "name": "AAP - Submitted",
+            "isDefault": false
+          },
+          {
+            "name": "AAP - Approved",
+            "isDefault": false
+          },
+          {
+            "name": "AAP - Refine",
+            "isDefault": false
+          },
+          {
+            "name": "AAP - Denied",
+            "isDefault": false
+          }
+        ]
+      },
+      {
+        "environment": "Pilot",
+        "steps": [
+          {
+            "name": "AIQ&RM Testing",
+            "isDefault": true
+          },
+          {
+            "name": "AIQ&RM Approve",
+            "isDefault": false
+          },
+          {
+            "name": "AIQ&RM Refine",
+            "isDefault": false
+          },
+          {
+            "name": "AIQ&RM Rejected",
+            "isDefault": false
+          }
+        ]
+      }
+    ]
+  }
+]

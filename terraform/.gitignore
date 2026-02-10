@@ -1,0 +1,69 @@
+# Terraform State Files
+*.tfstate
+*.tfstate.backup
+*.tfstate.old
+
+# Terraform Hidden Directory
+.terraform/
+.terraform.lock.hcl
+
+# Plan files
+*.tfplan
+
+# Log files or temporary outputs
+crash.log
+*.log
+
+# Optional sensitive variables
+# *.tfvars
+*.tfvars.json
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+terraform/layers/app/.terraform.tfstate.lock.info
+
+# Local environment files
+.env
+**/environments/.env
+set-env.sh
+
+# Generated provider files (use templates instead)
+# Uncomment if you want to ignore generated provider.tf files
+# **/provider.tf
+
+/info
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+
+/scripts/*

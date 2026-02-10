@@ -1,0 +1,475 @@
+#===============================================================================
+# Terraform State Drift Detection
+# 
+# This workflow detects configuration drift by comparing the actual Azure 
+# infrastructure state with the Terraform state files across all environments.
+#===============================================================================
+
+name: 🔍 Drift Detection
+
+on:
+  # Scheduled drift detection (daily at 6 AM UTC)
+  schedule:
+    - cron: '0 6 * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - dev
+          - qa
+          - uat
+          - prod
+        default: all
+      
+      layer:
+        description: 'Layer to check for drift'
+        required: false
+        type: choice
+        options:
+          - all
+          - admin
+          - app
+          - backend
+          - config
+          - core
+          - integration
+          - network
+          - shared
+        default: all
+
+env:
+  TF_VERSION: '1.13.0'
+  TF_LOG: WARN
+  ARM_USE_CLI: true
+
+jobs:
+  #=============================================================================
+  # Setup Matrix for Drift Detection
+  #=============================================================================
+  setup-matrix:
+    name: 🔧 Setup Detection Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Generate Matrix
+        id: matrix
+        run: |
+          # Define environments and layers based on actual repo structure
+          ENVIRONMENTS=("dev" "qa" "uat" "prod")
+          LAYERS=("admin" "app" "backend" "config" "core" "integration" "network" "shared")
+          
+          # Filter based on inputs (if manual trigger)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.environment }}" != "all" ]]; then
+              ENVIRONMENTS=("${{ github.event.inputs.environment }}")
+            fi
+            
+            if [[ "${{ github.event.inputs.layer }}" != "all" ]]; then
+              LAYERS=("${{ github.event.inputs.layer }}")
+            fi
+          fi
+          
+          # Function to detect tfvars file for a given layer/environment
+          detect_tfvars() {
+            local layer=$1
+            local env=$2
+            local env_dir="terraform/layers/${layer}/environments/${env}"
+            
+            if [[ ! -d "$env_dir" ]]; then
+              echo ""
+              return
+            fi
+            
+            # Check for environment-specific tfvars files
+            case "$env" in
+              dev)
+                # For dev, check for dev1, dev2, dev3 - use dev1 as default
+                if [[ -f "${env_dir}/dev1.tfvars" ]]; then
+                  echo "dev/dev1.tfvars"
+                elif [[ -f "${env_dir}/dev.tfvars" ]]; then
+                  echo "dev/dev.tfvars"
+                fi
+                ;;
+              qa)
+                if [[ -f "${env_dir}/qa.tfvars" ]]; then
+                  echo "qa/qa.tfvars"
+                fi
+                ;;
+              uat)
+                # For uat, prefer uat.tfvars, fallback to uat-prod.tfvars
+                if [[ -f "${env_dir}/uat.tfvars" ]]; then
+                  echo "uat/uat.tfvars"
+                elif [[ -f "${env_dir}/uat-prod.tfvars" ]]; then
+                  echo "uat/uat-prod.tfvars"
+                fi
+                ;;
+              prod)
+                # For prod, prefer prod.tfvars
+                if [[ -f "${env_dir}/prod.tfvars" ]]; then
+                  echo "prod/prod.tfvars"
+                fi
+                ;;
+            esac
+          }
+          
+          # Function to get runner group for environment
+          get_runner() {
+            local env=$1
+            case "$env" in
+              dev)
+                echo "large-runner-vnet-eyx"
+                ;;
+              qa)
+                echo "large-runner-vnet-eyx-qa"
+                ;;
+              uat)
+                echo "large-runner-grp-eyx-uat"
+                ;;
+              prod)
+                echo "large-runner-vnet-eyx-prod"
+                ;;
+              *)
+                echo "ubuntu-latest"
+                ;;
+            esac
+          }
+          
+          # Generate matrix combinations
+          MATRIX_INCLUDE=()
+          
+          for layer in "${LAYERS[@]}"; do
+            # Check if layer directory exists and has provider.tf
+            if [[ -d "terraform/layers/${layer}" ]] && [[ -f "terraform/layers/${layer}/provider.tf" ]]; then
+              for env in "${ENVIRONMENTS[@]}"; do
+                # Detect tfvars file
+                TFVARS_FILE=$(detect_tfvars "$layer" "$env")
+                
+                # Only include if tfvars file exists
+                if [[ -n "$TFVARS_FILE" ]]; then
+                  # Get runner group for this environment
+                  RUNNER_GROUP=$(get_runner "$env")
+                  MATRIX_INCLUDE+=("{\"environment\":\"${env}\",\"layer\":\"${layer}\",\"tfvars_file\":\"${TFVARS_FILE}\",\"runner\":\"${RUNNER_GROUP}\"}")
+                fi
+              done
+            fi
+          done
+          
+          # Format as JSON array
+          MATRIX_JSON="[$(IFS=,; echo "${MATRIX_INCLUDE[*]}")]"
+          echo "matrix=${MATRIX_JSON}" >> $GITHUB_OUTPUT
+          
+          echo "🔍 Drift detection matrix:"
+          echo "$MATRIX_JSON" | jq '.'
+
+  #=============================================================================
+  # Drift Detection Job
+  #=============================================================================
+  detect-drift:
+    name: 🔍 Detect (${{ matrix.layer }}-${{ matrix.environment }})
+    runs-on: ${{ fromJson(format('{{"group":"{0}"}}', matrix.runner)) }}
+    needs: setup-matrix
+    if: needs.setup-matrix.outputs.matrix != '[]'
+    environment: ${{ matrix.environment }}
+    
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+      max-parallel: 3
+      fail-fast: false
+    
+    env:
+      TF_WORKSPACE: ${{ matrix.layer }}-${{ matrix.environment }}
+      SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      BACKEND_SUBSCRIPTION_ID: ${{ secrets.BACKEND_SUBSCRIPTION_ID }}
+      RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+      STORAGE_ACCOUNT_NAME: ${{ vars.STORAGE_ACCOUNT_NAME }}
+      TF_STATE_PATH: ${{ matrix.environment }}/
+    
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Login to Azure
+      - name: 'Login to Azure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      # Step 3: Set up terraform
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      # Step 4: replace vars
+      - name: Replace placeholders in provider.tf
+        run: |
+          cd ./terraform/layers/${{ matrix.layer }}
+          sed -i 's|${SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          sed -i 's|${RESOURCE_GROUP_NAME}|${{ vars.RESOURCE_GROUP_NAME }}|g' provider.tf
+          sed -i 's|${STORAGE_ACCOUNT_NAME}|${{ vars.STORAGE_ACCOUNT_NAME }}|g' provider.tf
+          sed -i 's|${TF_STATE_PATH}|${{ matrix.environment }}/|g' provider.tf
+          sed -i 's|${TENANT_ID}|${{ secrets.AZURE_TENANT_ID }}|g' provider.tf
+          
+          if [[ "${{ matrix.environment }}" == "dev1" || "${{ matrix.environment }}" == "dev2" || "${{ matrix.environment }}" == "dev3" ]]; then
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.BACKEND_SUBSCRIPTION_ID }}|g' provider.tf
+          else
+            sed -i 's|\${BACKEND_SUBSCRIPTION_ID}|${{ secrets.AZURE_SUBSCRIPTION_ID }}|g' provider.tf
+          fi
+
+      # Step 5: Terraform init
+      - name: Terraform init
+        run: |
+          cd ./terraform/layers/${{ matrix.layer }}
+          terraform init
+      
+      # Step 6: Terraform plan for drift detection
+      - name: Terraform plan for drift detection
+        working-directory: terraform/layers/${{ matrix.layer }}
+        id: drift-check
+        continue-on-error: true
+        run: |
+          echo "🔍 Checking for configuration drift..."
+          echo "📁 Layer: ${{ matrix.layer }}"
+          echo "🌍 Environment: ${{ matrix.environment }}"
+          echo "📄 Tfvars file: ${{ matrix.tfvars_file }}"
+          
+          # Run plan to detect drift
+          terraform plan \
+            -detailed-exitcode \
+            -out=drift-plan \
+            -var-file="environments/${{ matrix.tfvars_file }}" \
+            > plan-output.txt 2>&1
+          
+          PLAN_EXIT_CODE=$?
+          
+          # Exit codes: 0 = no changes, 1 = error, 2 = changes detected
+          case $PLAN_EXIT_CODE in
+            0)
+              echo "drift_status=no-drift" >> $GITHUB_OUTPUT
+              echo "✅ No drift detected"
+              ;;
+            1)
+              echo "drift_status=error" >> $GITHUB_OUTPUT
+              echo "❌ Error during drift detection"
+              cat plan-output.txt
+              exit 1
+              ;;
+            2)
+              echo "drift_status=drift-detected" >> $GITHUB_OUTPUT
+              echo "⚠️ Configuration drift detected!"
+              
+              # Count changes
+              CHANGES=$(grep -E "Plan:|# " plan-output.txt | head -10 || echo "No change summary found")
+              echo "Changes summary:"
+              echo "$CHANGES"
+              ;;
+          esac
+      
+      - name: 📊 Parse Drift Details
+        working-directory: terraform/layers/${{ matrix.layer }}
+        if: steps.drift-check.outputs.drift_status == 'drift-detected'
+        run: |
+          echo "📊 Analyzing drift details..."
+          
+          # Extract change summary
+          ADD_COUNT=$(grep -c "will be created" plan-output.txt || echo "0")
+          CHANGE_COUNT=$(grep -c "will be updated" plan-output.txt || echo "0")
+          DESTROY_COUNT=$(grep -c "will be destroyed" plan-output.txt || echo "0")
+          
+          echo "## 🔍 Drift Detection: ${{ matrix.layer }}-${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ⚠️ Configuration Drift Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Changes Summary:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources to add: $ADD_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources to change: $CHANGE_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources to destroy: $DESTROY_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Show first few lines of plan
+          echo "**Plan Preview:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          head -50 plan-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 📊 No Drift Summary
+        if: steps.drift-check.outputs.drift_status == 'no-drift'
+        run: |
+          echo "## 🔍 Drift Detection: ${{ matrix.layer }}-${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✅ No Configuration Drift" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Infrastructure matches the Terraform configuration." >> $GITHUB_STEP_SUMMARY
+      
+      - name:  Upload Drift Plan
+        uses: actions/upload-artifact@v4
+        if: steps.drift-check.outputs.drift_status == 'drift-detected'
+        with:
+          name: drift-plan-${{ matrix.layer }}-${{ matrix.environment }}
+          path: terraform/layers/${{ matrix.layer }}/drift-plan
+          retention-days: 30
+      
+      - name: 📄 Upload Plan Output
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: plan-output-${{ matrix.layer }}-${{ matrix.environment }}
+          path: terraform/layers/${{ matrix.layer }}/plan-output.txt
+          retention-days: 7
+
+  #=============================================================================
+  # Drift Summary and Notifications
+  #=============================================================================
+  drift-summary:
+    name: 📋 Drift Summary
+    runs-on: ubuntu-latest
+    needs: [setup-matrix, detect-drift]
+    if: always() && needs.setup-matrix.outputs.matrix != '[]'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 📊 Compile Drift Report
+        run: |
+          echo "## 🔍 Infrastructure Drift Detection Report - EYX IaC" > drift-report.md
+          echo "" >> drift-report.md
+          echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> drift-report.md
+          echo "**Repository:** ${{ github.repository }}" >> drift-report.md
+          echo "**Trigger:** ${{ github.event_name }}" >> drift-report.md
+          echo "**Workflow Run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> drift-report.md
+          echo "" >> drift-report.md
+          
+          echo "### Summary" >> drift-report.md
+          echo "" >> drift-report.md
+          echo "- **Infrastructure:** EYX Azure Environment" >> drift-report.md
+          echo "- **Layers Scanned:** admin, app, backend, config, core, integration, network, shared" >> drift-report.md
+          echo "- **Environments:** dev, qa, uat, prod" >> drift-report.md
+          echo "- **Detection Method:** Terraform plan with Azure Storage backend" >> drift-report.md
+          echo "- **State Storage:** Azure Storage Account" >> drift-report.md
+          echo "" >> drift-report.md
+          
+          echo "### Drift Detection Results" >> drift-report.md
+          echo "" >> drift-report.md
+          echo "Review the individual job summaries in the workflow run for detailed drift analysis." >> drift-report.md
+          echo "" >> drift-report.md
+          
+          echo "### Recommendations" >> drift-report.md
+          echo "" >> drift-report.md
+          echo "1. **Review drift artifacts** uploaded to this workflow run" >> drift-report.md
+          echo "2. **Investigate root causes** of any detected drift" >> drift-report.md
+          echo "3. **Check for unauthorized changes** in Azure Portal" >> drift-report.md
+          echo "4. **Update Terraform configuration** if drift is expected" >> drift-report.md
+          echo "5. **Re-run deployments** to remediate unexpected drift" >> drift-report.md
+          echo "" >> drift-report.md
+          
+          echo "### Next Steps" >> drift-report.md
+          echo "" >> drift-report.md
+          echo "- Download drift plans from workflow artifacts" >> drift-report.md
+          echo "- Review plan output for detailed change information" >> drift-report.md
+          echo "- Use \`terraform apply\` with caution to remediate expected changes" >> drift-report.md
+          echo "- Investigate unexpected changes for security implications" >> drift-report.md
+          echo "- Update documentation if configuration intentionally changed outside Terraform" >> drift-report.md
+          echo "" >> drift-report.md
+          
+          echo "### State Lock Issues" >> drift-report.md
+          echo "" >> drift-report.md
+          echo "If state locks are preventing drift detection:" >> drift-report.md
+          echo "1. Check Azure Storage for \`.tflock\` files" >> drift-report.md
+          echo "2. Use \`terraform force-unlock <lock-id>\` if locks are stale" >> drift-report.md
+          echo "3. Manually delete lock blobs from Azure Storage if necessary" >> drift-report.md
+          echo "4. Use \`az storage blob delete\` command with proper authentication" >> drift-report.md
+          
+          # Copy to step summary
+          cat drift-report.md >> $GITHUB_STEP_SUMMARY
+      
+      - name: 💾 Upload Drift Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-detection-report-${{ github.run_id }}
+          path: drift-report.md
+          retention-days: 90
+      
+      - name: 🚨 Create Issue on Drift Detection
+        if: |
+          always() && 
+          (github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'all' || github.event_name == 'schedule') &&
+          contains(needs.detect-drift.result, 'failure')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Infrastructure Drift Detected - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## 🚨 Configuration Drift Alert - EYX IaC
+            
+            **Automatic drift detection has identified configuration differences in the infrastructure.**
+            
+            ### Details
+            - **Date**: ${new Date().toUTCString()}
+            - **Workflow**: ${context.workflow}
+            - **Run ID**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            - **Repository**: ${context.repo.owner}/${context.repo.repo}
+            - **Trigger**: ${context.eventName}
+            
+            ### Immediate Actions Required
+            1. 🔍 **Review** the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId}) artifacts
+            2. 🛡️ **Investigate** if drift indicates unauthorized changes in Azure
+            3. 🔐 **Check** Azure Activity Logs for manual changes
+            4. 📋 **Plan** remediation strategy
+            5. 🚀 **Execute** corrective deployment if needed
+            
+            ### Artifacts Available
+            - Drift plans showing proposed changes
+            - Plan outputs with detailed change information
+            - Drift detection report with summary
+            
+            ### Azure Environment Details
+            Check the Azure Portal or workflow configuration for environment-specific details:
+            - Subscription ID and resource group information available in GitHub Secrets
+            - State files stored in Azure Storage backend
+            - Review the workflow run for specific layer and environment combinations affected
+            
+            ### Remediation Options
+            1. **Accept drift**: Update Terraform configuration to match current state
+            2. **Revert drift**: Apply Terraform configuration to restore desired state
+            3. **Investigate**: Determine why manual changes were made
+            
+            ### State Lock Issues
+            If you encounter state lock errors:
+            \`\`\`bash
+            # Check for lock files in Azure Storage
+            az storage blob list --account-name <STORAGE_ACCOUNT> --container-name terraform --prefix "layers/" --query "[?contains(name, '.tflock')]"
+            
+            # Force unlock (use lock ID from error message)
+            cd terraform/layers/<layer>
+            terraform force-unlock <lock-id>
+            
+            # Or manually delete lock blob from Azure Storage
+            az storage blob delete --account-name <STORAGE_ACCOUNT> --container-name terraform --name "layers/<layer>/<env>/terraform.tfstate.tflock"
+            \`\`\`
+            
+            ---
+            *This issue was created automatically by the EYX IaC drift detection workflow.*
+            *Review the workflow logs and artifacts before taking any corrective action.*
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['infrastructure', 'drift-detection', 'eyx-iac', 'requires-investigation']
+            });

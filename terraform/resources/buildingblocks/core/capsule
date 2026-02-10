@@ -1,0 +1,164 @@
+###### Capsule ######
+# This Ansible Job is used to create and destroy Capsule resources in Azure.
+# Capsules are made of Resource Groups, Log Analytics Workspaces and Key Vaults.
+# They can also include VNETs and Subnets, but these are not mandatory.
+# Documentation: https://explore.eyfabric.ey.com/eydx/content/8e3d8da9-edb7-4300-ac5e-ef34ae68b550
+# Make sure to replace the placeholders with the actual values before running the job.
+# Use the corresponding Service Account credentials in Ansible to run the job.
+
+#### Capsule - Create
+var_location: <azurelocation>
+var_environment: <environment>
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: <charge-code>
+var_deploymentId: <deployment-id>
+var_productApp: 'EYX - Agent Framework'
+var_subscriptionId: <subscription-id>
+var_enableLogAnalyticsWorkspace: 'Yes'
+var_ctpService: Co-Dev
+
+
+var_location: eastus
+var_environment: UAT
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: I-69197406
+var_deploymentId: EYXU01
+var_productApp: 'EYX - Agent Framework'
+var_subscriptionId: bcff8cd6-13ff-48f9-8a70-2e5478106b1a
+var_enableLogAnalyticsWorkspace: 'Yes'
+var_ctpService: Co-Dev
+
+#### Capsule - Destroy
+var_subscriptionId: <subscription-id>
+var_resourceGroupName: <resource-group-name>
+var_location: <azurelocation>
+
+
+#### Storage - Create
+
+#### Subid
+var_subscriptionId: bcff8cd6-13ff-48f9-8a70-2e5478106b1a
+#### Tags
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: I-69197406
+var_deploymentId: CXS05H
+var_environment: Development
+var_ctpService: Co-Dev
+var_productApp: EYX - Agent Framework
+#OMS
+var_omsSubscriptionId: bcff8cd6-13ff-48f9-8a70-2e5478106b1a
+var_omsResourceGroup: USEDCXS05HRSG01
+var_omsWorkspaceName: USEDCXS05HLAW01
+#### Core
+var_location: eastus
+var_resourceGroupName: USEDCXS05HRSG01   
+# Settings
+var_storageAccountKind: StorageV2
+
+
+#### Storage - Destroy
+
+var_azure_rm_subid: 676a95d8-d953-4aa6-a7b3-6e5e5d649673
+var_subscriptionId: 676a95d8-d953-4aa6-a7b3-6e5e5d649673
+var_resourceGroupName: euwpilq019rsg01
+var_location: westeurope
+var_storageAccountName: euwpilq019sta01
+
+
+
+#### VNET
+ 
+#### Subid
+var_subscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+#### Tags
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: I-69197406
+var_deploymentId: EYXP01
+var_environment: Production 
+var_ctpService: Co-Dev
+var_productApp: EYX - Agent Framework
+#### OMS
+var_omsSubscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+var_omsResourceGroup: USEPEYXP01RSG01
+var_omsWorkspaceName: USEPEYXP01LAW01
+#### Core
+var_location: eastus
+var_resourceGroupName: USEPEYXP01RSG01
+var_virtualNetworkName: USEPEYXP01VNT01
+#### Settings
+var_ipamLocation: CTILEYXIPAM-Admin-Prod-IPRange01
+var_ipamOrganization: CTILEYXIPAM
+var_ipRangeName: CTILEYXIPAM-Admin-Prod-IPRange01
+var_numberOfIps: 24
+ 
+ 
+#### VNET - Destroy
+var_subscriptionId: bcff8cd6-13ff-48f9-8a70-2e5478106b1a
+var_location: eastus
+var_resourceGroupName: USEDCXS05HRSG01
+var_virtualNetworkName: USEDCXS05HVNT99
+var_ipamOrganization: CTILEYXIPAM
+var_ipamLocation: CTILEYXIPAM-Admin-Dev-01
+var_ipRangeName: CTILEYXIPAM-Admin-Dev-IPRange02
+ 
+ 
+#### Subnet
+ 
+#### Subid
+var_subscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+#### Tags
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: I-69197406
+var_deploymentId: EYXP01
+var_environment: Production 
+var_ctpService: Co-Dev
+var_productApp: EYX - Agent Framework
+#### OMS
+var_omsSubscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+var_omsResourceGroup: USEPEYXP01RSG01
+var_omsWorkspaceName: USEPEYXP01LAW01
+#### Core
+var_location: eastus
+var_resourceGroupName: USEPEYXP01RSG01
+var_virtualNetworkName: USEPEYXP01VNT01
+var_subnetName: USEPEYXP01SBN02
+#### Settings
+var_requiredIps: 8
+var_ipamLocation: CTILEYXIPAM-Admin-Prod-IPRange01
+var_ipamOrganization: CTILEYXIPAM
+var_ipRangeName: CTILEYXIPAM-Admin-Prod-IPRange01
+ 
+ 
+#### Subnet - Destroy
+var_subscriptionId: bcff8cd6-13ff-48f9-8a70-2e5478106b1a
+var_location: eastus
+var_subnetName: USEDCXS05HSBN99
+var_chargeCode: I-68933458
+var_ipamOrganization: CTILEYXIPAM
+var_ipamLocation: CTILEYXIPAM-Admin-Dev-01
+ 
+ 
+#### NSG
+ 
+var_subscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+var_resourceGroupName: USEPEYXP01RSG01
+var_product_app: EYX - Agent Framework
+var_environment: Production
+var_owner: "dante.ciai@gds.ey.com, juan.mercade@gds.ey.com, gustavo.sosa@gds.ey.com"
+var_chargeCode: I-68933458
+var_deploymentId: EYXP01
+var_subnetName: USEPEYXP01SBN02
+var_location: eastus
+var_omsSubscriptionId: 34e61f9b-75ea-4551-9788-b3090d59424e
+var_omsResourceGroup: USEPEYXP01RSG01
+var_omsWorkspaceName: USEPEYXP01LAW01
+var_ipamOrganization: CTILEYXIPAM
+var_networkSecurityGroupName: USEPEYXP01NSG02
+ 
+ 
+#### NSG - Destroy
+var_subscriptionId: 676a95d8-d953-4aa6-a7b3-6e5e5d649673
+var_location: westeurope
+var_networkSecurityGroupName: EUWPILQ019NSG01
+var_resourceGroupName: EUWPILQ019RSG01
+var_ipamOrganization: CTILDIPRODTENANTS
